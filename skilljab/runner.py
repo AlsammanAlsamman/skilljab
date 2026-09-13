@@ -77,8 +77,10 @@ def _checks_from_antibodies(skill_dir):
     by_stage = {}
     for a in read_json(p).get("antibodies", []):
         c = a.get("check")
-        if c and c.get("script") and c["script"] not in by_stage.setdefault(c.get("stage"), []):
-            by_stage[c.get("stage")].append(c["script"])
+        if not c or not c.get("script"): continue
+        for st in (c.get("stages") or [c.get("stage")]):
+            if c["script"] not in by_stage.setdefault(st, []):
+                by_stage[st].append(c["script"])
     return by_stage
 
 def run_pipeline(pipeline_yaml, data_csv, out_dir, skill_dir=None, stones_manifest=None, timeout=1800, label=None):

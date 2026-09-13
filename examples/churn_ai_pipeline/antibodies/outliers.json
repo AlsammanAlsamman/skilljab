@@ -6,8 +6,11 @@
   "headsup": "~50 rows had monthly_charges around \u00b1$800 (a decimal slip). Logistic regression is not robust to them: the charges coefficient was off by 90%.",
   "mitigation": "Range assertions at load; winsorize or drop documented impossible values; report how many.",
   "check": {
-    "stage": "prepare",
-    "script": "checks/scale_and_outliers.py"
+    "script": "checks/scale_and_outliers.py",
+    "stages": [
+      "prepare",
+      "train"
+    ]
   },
   "evidence": "simulated",
   "provenance": {

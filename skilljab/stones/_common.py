@@ -18,3 +18,9 @@ def pick_col(df, rng, col=None, exclude=()):
     if not cols:
         raise ValueError("no numeric column to perturb")
     return col if col in cols else str(rng.choice(cols))
+
+def as_float(df, col):
+    """Integer columns cannot hold shifted/outlying values; promote to float in place."""
+    if pd.api.types.is_integer_dtype(df[col]):
+        df[col] = df[col].astype(float)
+    return df

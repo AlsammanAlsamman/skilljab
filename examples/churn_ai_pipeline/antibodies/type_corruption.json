@@ -6,8 +6,11 @@
   "headsup": "monthly_charges came from a spreadsheet export with a few values like '1,234.50' and ' 89.9 '. pandas read the whole column as text, and get_dummies then one-hot encoded every distinct charge into ~1,400 columns. The model still ran, the coefficient for monthly_charges simply vanished, and every other coefficient was off by 2\u20137x.",
   "mitigation": "Assert dtypes on load (pd.to_numeric with errors='raise' on known numeric columns); encode only an explicit list of categoricals with fixed levels, never 'every object column'.",
   "check": {
-    "stage": "prepare",
-    "script": "checks/dummy_explosion.py"
+    "script": "checks/dummy_explosion.py",
+    "stages": [
+      "prepare",
+      "train"
+    ]
   },
   "evidence": "simulated",
   "provenance": {

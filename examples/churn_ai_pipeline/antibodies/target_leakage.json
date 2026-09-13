@@ -2,12 +2,15 @@
   "title": "A column that already knows the answer",
   "stage": "prepare",
   "node": "feature_selection",
-  "trigger": "a predictor with |corr| > 0.9 or single-feature AUC > 0.95 against churned",
+  "trigger": "a predictor with |corr| > 0.9 or single-feature AUC > 0.8 against churned",
   "headsup": "The model swallowed a column named churn_score_v1 \u2014 a score from an earlier model, i.e. a column computed from the outcome. AUC jumped to ~1.0 and every real driver (tenure, tickets, contract) shrank toward zero: the report would have said 'nothing matters except the score'. Customer tables are full of these: retention_offer_sent, refund_issued, account_status, days_since_cancellation \u2014 all populated after the customer decided.",
   "mitigation": "Whitelist predictors that existed before the churn decision; never 'use all columns'. Reject any feature whose single-feature AUC > 0.95.",
   "check": {
-    "stage": "prepare",
-    "script": "checks/no_leaky_columns.py"
+    "script": "checks/no_leaky_columns.py",
+    "stages": [
+      "prepare",
+      "train"
+    ]
   },
   "evidence": "simulated",
   "provenance": {

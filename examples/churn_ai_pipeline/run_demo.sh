@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Replays the SkillJab demo on the AI-written churn pipeline:
-#   baseline -> 10 stones (one per round) -> antibodies -> re-test -> sweeps -> report
+#   baseline -> 10 stones (one per round) -> antibodies -> re-test -> 10 hold-out stones -> sweeps -> report
 # Usage: ./run_demo.sh            (needs: pipx install skilljab ; python3 with pandas+sklearn)
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -44,6 +44,19 @@ skilljab tree add-evidence --tree $T --node duplicates --choice "no" --kind ston
 skilljab skill bump --skill $S --description "Churn model (logistic regression on a customer table), jabbed: 8 silent failures found, 6 now guarded by checks, 2 need data the table does not carry." >/dev/null
 echo "== rounds 11-20: the same stones against the immunized pipeline"
 for s in "${STONES[@]}"; do set -- $s; run "$1" "$2" "${3:-}"; done
+echo "== rounds 21-30: HOLD-OUT — perturbations the checkers were never written for"
+hold() { skilljab round new --skill $S >/dev/null; skilljab round stones --skill $S "$1" --level "$2" --dose "$3" ${4:+--after-stage "$4"} >/dev/null
+         skilljab round run --skill $S | python3 -c "import json,sys; d=json.load(sys.stdin); print(f'   {\"$5\":48s} -> {d[\"class\"]:11s} fired: {sorted({c[\"script\"].split(\"/\")[-1] for c in d[\"checks_fired\"]})}')"; }
+hold unit_mix          0.6 '{"unit_mix":{"col":"tenure_months","factor":12}}'                    "" "tenure in years for some rows (x12)"
+hold mnar_missing      0.7 '{"mnar_missing":{"col":"monthly_charges","target":"feature"}}'        "" "MNAR on monthly_charges"
+hold type_corruption   0.6 '{"type_corruption":{"col":"support_tickets"}}'                        "" "support_tickets exported as text"
+hold outliers          0.7 '{"outliers":{"col":"tenure_months","target":"feature","scale":15}}'   "" "impossible tenure values"
+hold correlated_block  0.9 '{"correlated_block":{"col":"tenure_months","n_copies":2}}'            "" "derived copies of tenure"
+hold target_leakage    0.9 '{"target_leakage":{"name":"days_to_cancel","noise_sd":0.6}}'          "" "a noisier leak (0.6 sd)"
+hold target_leakage    0.9 '{"target_leakage":{"name":"risk_flag","noise_sd":1.2}}'               "" "a very noisy leak (1.2 sd)"
+hold mnar_missing      0.8 '{"mnar_missing":{"target":"outcome"}}'                                "" "the outcome itself missing"
+hold batch_shift       0.5 '{"batch_shift":{"col":"support_tickets"}}'                            "" "hidden batch on tickets"
+hold unit_mix          0.6 '{"unit_mix":{"col":"monthly_charges","factor":100}}'                  "prepare" "cents/dollars AFTER prepare"
 echo "== dose sweeps"
 for spec in 'target_leakage {"name":"churn_score_v1"}' 'mnar_missing {"col":"support_tickets","target":"feature"}' 'unit_mix {"col":"monthly_charges","factor":100}' 'outliers {"col":"monthly_charges","target":"feature"}' 'measurement_error {"col":"tenure_months"}' 'batch_shift {"col":"monthly_charges"}' 'correlated_block {"col":"monthly_charges"}'; do set -- $spec; skilljab sweep --skill $S --stone $1 --levels 6 --fixed "$2" >/dev/null; echo "   swept $1"; done
 skilljab report --skill $S >/dev/null

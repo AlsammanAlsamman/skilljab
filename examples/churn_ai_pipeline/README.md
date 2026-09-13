@@ -41,6 +41,31 @@ runs at the `prepare` boundary, and a heads-up. Rounds 11–20 replay the same s
 That distinction — guarded vs. known-but-unguardable — is the point. A tool that claimed to catch
 everything would be lying; this one tells you which two questions to ask before you trust the model.
 
+**Then the hold-out — the part that makes it evidence.** Checkers written for a stone will of course
+catch that stone. So rounds 21–30 throw ten perturbations the checkers were *never written for*:
+tenure in years for some rows, MNAR on a different column, tickets exported as text, impossible
+tenure values, derived copies of tenure, a noisier leak, a *very* noisy leak, the outcome itself going
+missing, a milder hidden batch, and cents/dollars introduced *between* the two stages.
+
+| hold-out perturbation | result |
+|---|---|
+| tenure ×12 for some rows | **caught** by `scale_and_outliers` |
+| MNAR on `monthly_charges` | false alarm — check fired, estimates survived |
+| `support_tickets` as text | **caught** by `dummy_explosion` |
+| impossible tenure values | **caught** by `scale_and_outliers` |
+| derived copies of tenure | **caught** by `collinear_predictors` |
+| leak, noise 0.6 sd | **caught** by `no_leaky_columns` |
+| leak, noise 1.2 sd (83× error) | **caught** by `no_leaky_columns` |
+| outcome itself missing | **caught** by `missingness_by_outcome` |
+| hidden batch on tickets | silent — the known unguardable |
+| cents/dollars after `prepare` | **caught** at the `train` boundary |
+
+Eight of ten caught by antibodies written for something else; the one miss is the batch the skill already
+says it cannot see. The first pass of this hold-out was worse — the very noisy leak got through (the leak
+check's threshold was too strict) and the between-stages stone was silent (checks only ran after
+`prepare`). Both are fixed above; that is the loop doing its job, and it is in the replay so you can watch
+it happen.
+
 ## Reproduce
 
 ```bash

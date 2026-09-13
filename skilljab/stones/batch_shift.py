@@ -1,10 +1,10 @@
 """A hidden batch: shift one feature AND the outcome for a `frac` subgroup, so the batch is
 confounded with the feature. No batch column is written (the whole point)."""
 import numpy as np
-from ._common import pick_col, outcome_col
+from ._common import as_float, pick_col, outcome_col
 
 def apply(df, rng, frac=0.3, shift=1.0, col=None):
-    df = df.copy(); c = pick_col(df, rng, col); y = outcome_col(df)
+    df = df.copy(); c = pick_col(df, rng, col); y = outcome_col(df); as_float(df, c)
     mask = rng.uniform(size=len(df)) < frac
     xsd = np.nanstd(df[c].to_numpy(dtype=float)) or 1.0
     # the batch moves the feature a little and the outcome a lot -> confounded

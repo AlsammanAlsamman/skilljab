@@ -6,8 +6,11 @@
   "headsup": "15% of monthly_charges were recorded in cents (one billing region's export). The coefficient for charges collapsed to ~0 \u2014 the model concluded that price does not affect churn. No error, no warning, a clean AUC.",
   "mitigation": "Assert a plausible range per numeric column at load; plot the distribution per data source before modelling.",
   "check": {
-    "stage": "prepare",
-    "script": "checks/scale_and_outliers.py"
+    "script": "checks/scale_and_outliers.py",
+    "stages": [
+      "prepare",
+      "train"
+    ]
   },
   "evidence": "simulated",
   "provenance": {

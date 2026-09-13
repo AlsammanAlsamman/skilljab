@@ -6,8 +6,11 @@
   "headsup": "The table carried monthly_charges together with derived copies (charges with tax, annualised charges, last-invoice amount). The model split the price effect arbitrarily across them; the reported coefficient for monthly_charges was 127% off and its sign is not stable between runs.",
   "mitigation": "Keep one representative per group of near-duplicate predictors; check pairwise correlations before fitting.",
   "check": {
-    "stage": "prepare",
-    "script": "checks/collinear_predictors.py"
+    "script": "checks/collinear_predictors.py",
+    "stages": [
+      "prepare",
+      "train"
+    ]
   },
   "evidence": "simulated",
   "provenance": {

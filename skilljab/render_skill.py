@@ -46,11 +46,11 @@ def render(ab: dict, tree: dict | None = None, lineup_stats: dict | None = None)
             if a.get("trigger"): L += [f"- **Trigger:** {a['trigger']}"]
             if a.get("headsup"): L += [f"- **Heads-up:** {a['headsup']}"]
             if a.get("mitigation"): L += [f"- **Do:** {a['mitigation']}"]
-            if a.get("check", {}).get("script"): L += [f"- **Check:** `{a['check']['script']}` runs after stage `{a['check'].get('stage','?')}`"]
+            if a.get("check", {}).get("script"): L += [f"- **Check:** `{a['check']['script']}` runs after stage(s) `{', '.join(a['check'].get('stages') or [a['check'].get('stage','?')])}`"]
             L += [""]
     checks = [a for a in ab.get("antibodies", []) if a.get("check", {}).get("script")]
     L += ["## Checks that run at stage boundaries", ""]
-    L += [f"- after `{a['check'].get('stage','?')}`: `{a['check']['script']}` — {a.get('title','')}" for a in checks] or ["_none yet_"]
+    L += [f"- after `{', '.join(a['check'].get('stages') or [a['check'].get('stage','?')])}`: `{a['check']['script']}` — {a.get('title','')}" for a in checks] or ["_none yet_"]
     L += [""]
     if tree and tree.get("nodes"):
         L += ["## Decisions and what the evidence says", ""] + T.summary(tree) + [""]
