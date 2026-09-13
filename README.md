@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/icon/skilljab-mascot-v1.jpeg" alt="SkillJab mascot — a winking syringe with a boxing glove, jabbing a bar chart" width="260">
+  <img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/icon/skilljab-icon-512.png" alt="SkillJab mascot — a winking syringe with a boxing glove, jabbing a bar chart" width="240">
 </p>
 
 <h1 align="center">SkillJab</h1>
