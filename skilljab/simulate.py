@@ -23,12 +23,22 @@ def generator(name):
     return deco
 
 def _features(rng, n, spec):
+    """features: {numeric: 4 | [names] | {name: {mean, sd, min}}, categorical: 1 | {name: [levels]}, categories: 3}"""
     f = spec.get("features", {})
-    k = int(f.get("numeric", 4)); kc = int(f.get("categorical", 0)); ncat = int(f.get("categories", 3))
-    X = rng.normal(size=(n, k))
-    df = pd.DataFrame(X, columns=[f"x{i+1}" for i in range(k)])
-    for j in range(kc):
-        df[f"cat{j+1}"] = rng.choice([f"c{i}" for i in range(ncat)], size=n)
+    num = f.get("numeric", 4)
+    if isinstance(num, int):
+        num = {f"x{i+1}": {} for i in range(num)}
+    elif isinstance(num, list):
+        num = {c: {} for c in num}
+    df = pd.DataFrame({c: rng.normal(loc=float(o.get("mean", 0.0)), scale=float(o.get("sd", 1.0)), size=n) for c, o in num.items()})
+    for c, o in num.items():
+        if "min" in o: df[c] = np.maximum(df[c], float(o["min"]))
+        if o.get("integer"): df[c] = np.round(df[c]).astype(int)
+    cat = f.get("categorical", 0); ncat = int(f.get("categories", 3))
+    if isinstance(cat, int):
+        cat = {f"cat{j+1}": [f"c{i}" for i in range(ncat)] for j in range(cat)}
+    for c, levels in cat.items():
+        df[c] = rng.choice(list(levels), size=n)
     return df
 
 @generator("tabular_regression")
@@ -51,11 +61,17 @@ def tabular_classification(rng, n, spec):
     effects = t.get("effects") or {"x1": 1.0, "x2": -0.7}
     eta = float(t.get("intercept", 0.0)) + np.zeros(n)
     for col, b in effects.items():
-        eta = eta + float(b) * df[col].to_numpy()
+        eta = eta + float(b) * df[col].to_numpy(dtype=float)
+    for col, levels in (t.get("cat_effects") or {}).items():   # {"contract": {"two_year": -1.2}}
+        for lv, b in levels.items():
+            eta = eta + float(b) * (df[col].to_numpy() == lv)
     p = 1 / (1 + np.exp(-eta))
     df["y"] = (rng.uniform(size=n) < p).astype(int)
     truth = {f"beta_{c}": float(b) for c, b in effects.items()}
+    for col, levels in (t.get("cat_effects") or {}).items():
+        for lv, b in levels.items(): truth[f"beta_{col}_{lv}"] = float(b)
     truth["prevalence"] = float(p.mean())
+    if t.get("outcome"): df = df.rename(columns={"y": t["outcome"]})
     return df, truth
 
 @generator("two_group_lift")

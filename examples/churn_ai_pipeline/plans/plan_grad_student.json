@@ -1,0 +1,12 @@
+{"name": "plan_grad_student", "persona": "new_grad_student", "constraint": "python_only",
+ "deliverable": "A table of logistic-regression coefficients ranked by absolute size, plus AUC, answering 'which factors matter most'.",
+ "stages": [{"id": "prepare", "name": "drop NA rows, one-hot encode categoricals", "tool": "pandas", "lang": "python"},
+            {"id": "train", "name": "logistic regression on all columns", "tool": "sklearn", "lang": "python"}],
+ "decisions": [
+  {"id": "missing_handling", "question": "What to do with incomplete rows?", "choice": "dropna", "alternatives": ["impute", "missing-indicator"], "why": "simplest; the tutorial does it"},
+  {"id": "feature_selection", "question": "Which columns enter the model?", "choice": "all columns", "alternatives": ["whitelist", "drop post-outcome fields"], "why": "let the model decide"},
+  {"id": "encoding", "question": "How to encode categoricals?", "choice": "get_dummies drop_first", "alternatives": ["target encoding", "explicit levels"], "why": "standard"},
+  {"id": "duplicates", "question": "Check for duplicated customers?", "choice": "no", "alternatives": ["dedupe on customer_id"], "why": "did not think of it"}],
+ "assumptions": ["every row is one customer", "all columns were known before the churn decision", "numeric columns are numeric"],
+ "one_check": "AUC on a held-out split",
+ "retraction_notice": "The model's top factor turned out to be a field populated by the retention team after the customer had already cancelled."}

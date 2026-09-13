@@ -196,6 +196,9 @@ skilljab/
 - Hook is `PreToolUse` on Bash: adds a warning as `additionalContext` when a command mentions a jabbed pipeline's scripts and the skill is stale. Never blocks.
 - Verdict classes: crashed · silent · caught · false_alarm · harmless. Only silent/crashed count against `jabbed`.
 
+### The churn demo (2026-09-13) — first real test
+`examples/churn_ai_pipeline/`: the pipeline Claude writes for "build a churn model, which factors matter" (dropna → get_dummies → logistic regression on everything). Clean recovery passes (AUC 0.73). Ten stones, one per round: **8 silent failures** (leak, numeric-as-text one-hot explosion, MNAR on support tickets, cents/dollars, hidden batch, outliers, collinear copies, noisy tenure); 2 harmless (duplicates, rare level). Six antibody checkers written; re-test: 6 caught, 2 remain silent by nature (hidden batch, measurement error) — the skill says which columns to ask for. Engine changes this forced: named features + categorical effects in the simulator, checkers receive the stage input as argv[2], outcome-aware stones, batch_shift preserves prevalence on binary outcomes, type_corruption copy bug, absolute tolerance is a floor (spec must set it below the smallest coefficient), sweep "knee" = first degradation (silent_from separately), shared checkers deduped. Replay: `run_demo.sh` (~3 min). Report + skill copies in `docs/demo/churn/`.
+
 ### Open (deliberately)
 
 - `spec.yaml` generators: hand-written per data type, or AI-drafted + engine-validated (planted truth must be recoverable in a clean run)? Leaning AI-drafted + validated.

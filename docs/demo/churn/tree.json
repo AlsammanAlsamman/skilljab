@@ -1,0 +1,210 @@
+{
+  "version": 1,
+  "built": "2026-09-13T06:37:22",
+  "nodes": [
+    {
+      "id": "missing_handling",
+      "question": "What to do with incomplete rows?",
+      "branches": [
+        {
+          "choice": "dropna",
+          "votes": 1,
+          "plans": [
+            "plan_grad_student"
+          ],
+          "why": [
+            "simplest; the tutorial does it"
+          ],
+          "evidence": [
+            {
+              "kind": "stone",
+              "summary": "mnar_missing on support_tickets: effect 67% too small",
+              "verdict": "silent",
+              "round": 3,
+              "added": "2026-09-13T06:37:43"
+            }
+          ],
+          "status": "rejected"
+        },
+        {
+          "choice": "impute",
+          "votes": 1,
+          "plans": [
+            "plan_ml_engineer"
+          ],
+          "why": [
+            "dropna on 2M rows nightly silently changes the population"
+          ],
+          "evidence": [],
+          "status": "open"
+        },
+        {
+          "choice": "missing-indicator + report missingness by outcome",
+          "votes": 1,
+          "plans": [
+            "plan_statistician"
+          ],
+          "why": [
+            "complete-case analysis is biased when missingness depends on the outcome"
+          ],
+          "evidence": [
+            {
+              "kind": "stone",
+              "summary": "missingness_by_outcome.py fires",
+              "verdict": "caught",
+              "round": 13,
+              "added": "2026-09-13T06:37:44"
+            }
+          ],
+          "status": "default"
+        }
+      ]
+    },
+    {
+      "id": "feature_selection",
+      "question": "Which columns enter the model?",
+      "branches": [
+        {
+          "choice": "all columns",
+          "votes": 1,
+          "plans": [
+            "plan_grad_student"
+          ],
+          "why": [
+            "let the model decide"
+          ],
+          "evidence": [
+            {
+              "kind": "stone",
+              "summary": "target_leakage: churn_score_v1 swallowed, AUC ~1, drivers -> 0",
+              "verdict": "silent",
+              "round": 1,
+              "added": "2026-09-13T06:37:43"
+            }
+          ],
+          "status": "rejected"
+        },
+        {
+          "choice": "drop post-outcome fields",
+          "votes": 1,
+          "plans": [
+            "plan_ml_engineer"
+          ],
+          "why": [
+            "score fields from earlier models leak"
+          ],
+          "evidence": [],
+          "status": "open"
+        },
+        {
+          "choice": "whitelist",
+          "votes": 1,
+          "plans": [
+            "plan_statistician"
+          ],
+          "why": [
+            "only variables measured before the churn event; anything else is leakage"
+          ],
+          "evidence": [
+            {
+              "kind": "stone",
+              "summary": "no_leaky_columns.py catches the leak",
+              "verdict": "caught",
+              "round": 11,
+              "added": "2026-09-13T06:37:43"
+            }
+          ],
+          "status": "default"
+        }
+      ]
+    },
+    {
+      "id": "encoding",
+      "question": "How to encode categoricals?",
+      "branches": [
+        {
+          "choice": "get_dummies drop_first",
+          "votes": 1,
+          "plans": [
+            "plan_grad_student"
+          ],
+          "why": [
+            "standard"
+          ],
+          "evidence": [
+            {
+              "kind": "stone",
+              "summary": "type_corruption: numeric-as-text one-hot into ~1,400 columns",
+              "verdict": "silent",
+              "round": 2,
+              "added": "2026-09-13T06:37:44"
+            }
+          ],
+          "status": "rejected"
+        },
+        {
+          "choice": "explicit levels",
+          "votes": 2,
+          "plans": [
+            "plan_ml_engineer",
+            "plan_statistician"
+          ],
+          "why": [
+            "a new plan name at inference must not crash the job",
+            "get_dummies on a numeric-as-text column silently one-hots every value"
+          ],
+          "evidence": [
+            {
+              "kind": "stone",
+              "summary": "dummy_explosion.py fires",
+              "verdict": "caught",
+              "round": 12,
+              "added": "2026-09-13T06:37:44"
+            }
+          ],
+          "status": "default"
+        }
+      ]
+    },
+    {
+      "id": "duplicates",
+      "question": "Check for duplicated customers?",
+      "branches": [
+        {
+          "choice": "no",
+          "votes": 1,
+          "plans": [
+            "plan_grad_student"
+          ],
+          "why": [
+            "did not think of it"
+          ],
+          "evidence": [
+            {
+              "kind": "stone",
+              "summary": "duplicates: point estimates unchanged (standard errors would be wrong)",
+              "verdict": "harmless",
+              "round": 4,
+              "added": "2026-09-13T06:37:45"
+            }
+          ],
+          "status": "open"
+        },
+        {
+          "choice": "dedupe on customer_id",
+          "votes": 2,
+          "plans": [
+            "plan_ml_engineer",
+            "plan_statistician"
+          ],
+          "why": [
+            "billing join",
+            "joins to billing tables duplicate rows and shrink standard errors"
+          ],
+          "evidence": [],
+          "status": "open"
+        }
+      ]
+    }
+  ]
+}

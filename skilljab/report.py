@@ -39,7 +39,10 @@ def collect(skill_dir) -> dict:
                            "time_impact": vj.get("time_impact", {}), "estimands": vj.get("estimands", {})})
     sweeps = []
     for sp in sorted((h / "sweeps").glob("*.json")) if (h / "sweeps").exists() else []:
-        sj = read_json(sp); sj["character"] = chars.get(sj.get("stone"), sj.get("stone")); sweeps.append(sj)
+        sj = read_json(sp); sj["character"] = chars.get(sj.get("stone"), sj.get("stone"))
+        sj["knee_level"] = next((l["level"] for l in sj["levels"] if l["class"] in ("silent", "caught", "crashed")), None)
+        sj["silent_from"] = next((l["level"] for l in sj["levels"] if l["class"] in ("silent", "crashed")), None)
+        sweeps.append(sj)
     timing = read_json(h / "timing.json") if (h / "timing.json").exists() else None
     ll = read_json(h / "lineup_log.json") if (h / "lineup_log.json").exists() else {"entries": []}
     # per-stage fragility: stones that landed on this stage
@@ -58,7 +61,7 @@ def collect(skill_dir) -> dict:
     headline = None
     if silent_all:
         w = max(silent_all, key=lambda r: (r["class"] == "silent", r["worst_rel_err"] or 0))
-        est = [(k, e) for k, e in w["estimands"].items() if e.get("degraded")]
+        est = sorted([(k, e) for k, e in w["estimands"].items() if e.get("degraded")], key=lambda kv: -(kv[1].get("rel_err") or 1e9))
         what = f"`{est[0][0]}` moved {est[0][1]['rel_err']:.0%} from the planted truth" if est and est[0][1].get("rel_err") is not None else "the pipeline crashed"
         headline = f"Round {w['round']}: {w['character']} ({w['stone']}) hit stage {w['stage']} — {what} and nothing warned you."
     elif rounds:

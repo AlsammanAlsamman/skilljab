@@ -32,27 +32,56 @@ SkillJab is a **jab** — a small controlled hit, like a vaccine shot or a sparr
 
 And it hands you a **crash-test report** so you can see, in one page, where your analysis is strong and where it is fragile.
 
+## A real test: the churn model Claude wrote
+
+The kind of prompt people give an AI every day: *"Here's a CSV of our customers — tenure, monthly charges, support tickets, contract, plan, churned. Build a churn model and tell me which factors matter."* Claude wrote `dropna` → `get_dummies` → logistic regression on every column. Clean code. On clean data it recovers every planted effect: AUC 0.73, factors ranked correctly.
+
+Then SkillJab threw ten stones at it, one per round — each one a thing that happens to real customer tables. **Eight broke the answer and nothing warned anyone:**
+
+| what a real table does | what the AI's pipeline reported |
+|---|---|
+| a `churn_score_v1` column from an earlier model | AUC 1.0; "nothing matters except the score" |
+| `monthly_charges` exported as text (`'1,234.50'`) | `get_dummies` made 1,400 columns; the price coefficient vanished |
+| support history purged for closed accounts | `dropna` removed the churners; ticket effect 67% too small |
+| one billing region in cents | "price doesn't affect churn" |
+| one acquisition channel pricier and churnier, unlabelled | every coefficient ~100% off |
+| ~50 bills at ±$800 (decimal slip) | price effect 90% off |
+| charges + charges-with-tax + annual charges | price effect split three ways, sign unstable |
+| tenure derived from a noisy invoice date | tenure effect 70% too small, mis-ranked |
+
+Then the explainer wrote the antibodies. Same ten stones again: **six caught**, two still silent — and for those two the skill says plainly that the data as delivered cannot reveal them and which columns to ask for. That distinction is the product: not "we catch everything," but "here is what's guarded, here is what isn't, and here is the question to ask before you trust the model."
+
+Full write-up, the pipeline, and a script that replays it in three minutes: [`examples/churn_ai_pipeline/`](examples/churn_ai_pipeline/). The rendered report and the skill it produced: [`docs/demo/churn/`](docs/demo/churn/).
+
 ## The report
 
-The report is what you'll actually look at. One sentence at the top tells you the worst thing it found; everything below shows where and how much.
+One sentence at the top tells you the worst thing it found; everything below shows where and how much. These are from the churn test above.
 
-<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/01-headline-and-stars.png" alt="Headline: Round 1: The Time Traveler (target_leakage) hit stage clean — beta_x1 moved 90% from the planted truth and nothing warned you. Star rating per stage." width="880"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/01-headline-and-stars.png" alt="Headline: Round 1: The Time Traveler (target_leakage) hit stage prepare — beta_contract_one_year moved 5767% from the planted truth and nothing warned you. Star rating per stage: prepare 2 stars, train 5 stars." width="880"></p>
 
 **Star rating per stage** — which step of your pipeline is weak, in two seconds. A stage loses stars for every stone that broke the result without any check firing.
 
-<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/02-twin-result.png" alt="Twin result: drag the dose and watch your estimates move relative to the planted truth" width="880"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/02-twin-result.png" alt="Twin result: your estimates against the planted truth, with a dose slider" width="880"></p>
 
-**Slow-motion replay** — your own estimates against the planted truth, with a slider for the dose. You watch the number leave the green band and see the point where nothing would have told you.
+**Slow-motion replay** — your own estimates against the planted truth, with a slider for the dose. You watch the coefficient leave the green band and see the point where nothing would have told you.
 
-<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/03-curves-and-matrix.png" alt="Breaking-point curves (dose vs error, with the tolerance line) and the fragility matrix (stone × stage)" width="880"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/03-breaking-points.png" alt="Breaking-point curves: dose against error for seven stones, with the tolerance line; dots colored by whether a check caught it" width="880"></p>
 
-**Where it breaks** — dose against error for each stone; the knee is the fragility. It answers "how much missingness can I survive?" with a number instead of a warning. **Impact points** — stone × stage, colored by the worst outcome seen: red is silent, green is caught, grey is harmless.
+**Where it breaks** — dose against error for each stone; the knee is the fragility. It answers "how much missingness can I survive?" with a number instead of a warning. After immunization the dots turn green: the checks fire at every dose that breaks the result.
 
-<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/04-lap-times-and-immunity.png" alt="Lap times: predicted runtime per stage at the real N, with ranges and a checkpoint suggestion; the vaccination card: rounds × stones turning from red to green" width="880"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/04-fragility-matrix.png" alt="Fragility matrix: stone by stage, colored by worst outcome — red silent, green caught, grey harmless" width="880"></p>
 
-**Lap times** — predicted runtime per stage at your *real* N, extrapolated from three miniature sizes, with the range, a flag for anything superlinear, and where to place a cheap check so a bad input dies at minute two instead of hour six. **Immunity record** — rounds × stones; red turning green is the skill learning.
+**Impact points** — stone × stage, colored by the worst outcome ever seen: red is silent, green is caught, grey is harmless. The two reds that remain are the ones the skill says it cannot guard without more columns.
 
-The report is a single self-contained HTML file. No server, no external requests, safe to email. See a real one from the toy example: [`docs/demo/report.html`](docs/demo/report.html).
+<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/05-lap-times.png" alt="Lap times: predicted runtime per stage at N = 2,000,000 with ranges and a checkpoint suggestion" width="880"></p>
+
+**Lap times** — predicted runtime per stage at your *real* N (here 2,000,000 customers), extrapolated from three miniature sizes, with the range, a flag for anything superlinear, and where to put a cheap check so a bad input dies at minute two instead of hour six.
+
+<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/06-immunity-record.png" alt="Vaccination card: rounds by stones, red turning green as antibodies were added, plus the list of antibodies and the judge's calibration" width="880"></p>
+
+**Immunity record** — rounds × stones; red turning green is the skill learning. Below it, every antibody with its provenance, and how often the judge picked the right plan in the lineup.
+
+The report is a single self-contained HTML file. No server, no external requests, safe to email.
 
 ## What you get, in your repo
 
@@ -86,7 +115,7 @@ Then, in Claude Code, on any analysis:
 /skilljab:report                       the crash-test page
 ```
 
-Try it on the shipped example first — a deliberately naive regression that SkillJab breaks four different ways:
+Try it on the shipped examples first — `examples/churn_ai_pipeline/` (the real test above, `./run_demo.sh`) or the minimal `examples/toy_regression/`:
 
 ```bash
 cd skilljab/examples/toy_regression

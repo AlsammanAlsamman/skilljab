@@ -145,7 +145,7 @@ function curves(d) {
   svg += `</svg>`;
   card.appendChild($(`<div class="scroll">${svg}</div>`));
   const lg = $(`<div class="legend"></div>`);
-  d.sweeps.forEach((s, i) => lg.appendChild($(`<span><span class="dot" style="background:${cols[i%cols.length]}"></span>${esc(s.character)} · knee ${s.knee_level==null?'none':(s.knee_level*100).toFixed(0)+'%'}</span>`)));
+  d.sweeps.forEach((s, i) => lg.appendChild($(`<span><span class="dot" style="background:${cols[i%cols.length]}"></span>${esc(s.character)} · breaks at ${s.knee_level==null?'never':(s.knee_level*100).toFixed(0)+'%'}${s.silent_from!=null?` · <b style="color:var(--coral)">silent from ${(s.silent_from*100).toFixed(0)}%</b>`:' · always caught'}</span>`)));
   lg.appendChild($(`<span>dots: <span class="dot" style="background:var(--coral)"></span>silent <span class="dot" style="background:var(--green)"></span>caught <span class="dot" style="background:var(--grey)"></span>harmless</span>`));
   card.appendChild(lg);
   return card;

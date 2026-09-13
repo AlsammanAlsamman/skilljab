@@ -1,0 +1,19 @@
+{
+  "title": "dropna removed the churners",
+  "stage": "prepare",
+  "node": "missing_handling",
+  "trigger": "missingness of any column differs by > 5 points between churned and not, or the stage drops > 5% of rows",
+  "headsup": "support_tickets was blank for the customers with the most tickets \u2014 because their ticket history is purged when an account closes. dropna therefore removed a biased slice of churners, and the effect of support tickets on churn came out 67% too small. Missingness that depends on the outcome is the norm in operational data, not the exception.",
+  "mitigation": "Report missingness per column split by outcome before dropping anything; use a missing indicator or imputation; never complete-case by default.",
+  "check": {
+    "stage": "prepare",
+    "script": "checks/missingness_by_outcome.py"
+  },
+  "evidence": "simulated",
+  "provenance": {
+    "round": 3,
+    "stone": "mnar_missing",
+    "trick": "stone",
+    "worst_rel_err": 0.67
+  }
+}

@@ -14,7 +14,7 @@ pipeline.yaml:
 Placeholders: {in} {out} {workdir} {pipeline_dir} {skill_dir}
 The last stage's output must be result.json = {"estimates": {estimand: value}}.
 
-Check script contract: `python check.py <stage_output>`; exit 0 = pass; exit 1 = FIRED
+Check script contract: `python check.py <stage_output> <stage_input>`; exit 0 = pass; exit 1 = FIRED
 (stdout is the message); anything else = check error. A JSON stdout {"fired":..,"message":..}
 is honoured too.
 """
@@ -52,13 +52,14 @@ def _run_cmd(cmd, cwd, timeout):
         peak_mb = round(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss / 1024, 1)
     return rc, round(secs, 4), peak_mb, out[-2000:], err[-2000:]
 
-def _run_check(script, target, skill_dir, cwd, timeout):
+def _run_check(script, target, skill_dir, cwd, timeout, stage_input=None):
     path = pathlib.Path(script)
     if not path.is_absolute():
         path = pathlib.Path(skill_dir) / script
     if not path.exists():
         return {"script": str(script), "fired": False, "error": "check script not found"}
-    rc, secs, _, out, err = _run_cmd(f"python3 {shlex.quote(str(path))} {shlex.quote(str(target))}", cwd, timeout)
+    argv = f"python3 {shlex.quote(str(path))} {shlex.quote(str(target))}" + (f" {shlex.quote(str(stage_input))}" if stage_input else "")
+    rc, secs, _, out, err = _run_cmd(argv, cwd, timeout)
     msg = out.strip()
     try:
         j = json.loads(msg); fired = bool(j.get("fired")); msg = j.get("message", msg)
@@ -76,8 +77,8 @@ def _checks_from_antibodies(skill_dir):
     by_stage = {}
     for a in read_json(p).get("antibodies", []):
         c = a.get("check")
-        if c and c.get("script"):
-            by_stage.setdefault(c.get("stage"), []).append(c["script"])
+        if c and c.get("script") and c["script"] not in by_stage.setdefault(c.get("stage"), []):
+            by_stage[c.get("stage")].append(c["script"])
     return by_stage
 
 def run_pipeline(pipeline_yaml, data_csv, out_dir, skill_dir=None, stones_manifest=None, timeout=1800, label=None):
@@ -111,8 +112,8 @@ def run_pipeline(pipeline_yaml, data_csv, out_dir, skill_dir=None, stones_manife
         if rc != 0 or not out_path.exists():
             rec["crashed"] = True; run["crashed"] = True; run["stages"].append(rec); break
         # checkers for this stage: pipeline.yaml + antibodies
-        for script in list(st.get("checks") or []) + ab_checks.get(st["id"], []):
-            rec["checks"].append(_run_check(script, out_path, skill_dir, str(pipeline_dir), 300))
+        for script in dict.fromkeys(list(st.get("checks") or []) + ab_checks.get(st["id"], [])):
+            rec["checks"].append(_run_check(script, out_path, skill_dir, str(pipeline_dir), 300, stage_input=current))
         # stones landing after this stage
         if out_path.suffix == ".csv":
             rec["stones_applied"] = apply_manifest(out_path, out_path, manifest, after_stage=st["id"])

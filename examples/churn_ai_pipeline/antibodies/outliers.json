@@ -1,0 +1,19 @@
+{
+  "title": "A few impossible bills",
+  "stage": "prepare",
+  "node": "encoding",
+  "trigger": "any value > 8 MAD from the column median",
+  "headsup": "~50 rows had monthly_charges around \u00b1$800 (a decimal slip). Logistic regression is not robust to them: the charges coefficient was off by 90%.",
+  "mitigation": "Range assertions at load; winsorize or drop documented impossible values; report how many.",
+  "check": {
+    "stage": "prepare",
+    "script": "checks/scale_and_outliers.py"
+  },
+  "evidence": "simulated",
+  "provenance": {
+    "round": 8,
+    "stone": "outliers",
+    "trick": "stone",
+    "worst_rel_err": 0.9
+  }
+}

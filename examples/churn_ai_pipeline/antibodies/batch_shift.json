@@ -1,0 +1,15 @@
+{
+  "title": "A hidden batch with its own churn rate",
+  "stage": "train",
+  "node": "feature_selection",
+  "trigger": "no cheap check from the data alone \u2014 needs a source/region/channel column",
+  "headsup": "One acquisition channel had both higher charges and a much higher churn rate. With no channel column in the model, the price coefficient absorbed the channel effect: every coefficient was off by ~100%. Nothing in the data as delivered can reveal this \u2014 the batch label is missing by construction.",
+  "mitigation": "Ask for the provenance columns (region, channel, plate, site, export batch) and include them; compare the churn rate per source before modelling. Until then, treat coefficients as confounded.",
+  "evidence": "simulated",
+  "provenance": {
+    "round": 6,
+    "stone": "batch_shift",
+    "trick": "stone",
+    "worst_rel_err": 1.67
+  }
+}

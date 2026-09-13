@@ -12,7 +12,10 @@ def apply(df, rng, frac=0.3, shift=1.0, col=None):
     if np.issubdtype(df[y].dtype, np.floating):
         ysd = np.nanstd(df[y].to_numpy(dtype=float)) or 1.0
         df.loc[mask, y] = df.loc[mask, y] + shift * ysd
-    else:  # binary outcome: raise its rate in the batch
-        flip = mask & (df[y] == 0) & (rng.uniform(size=len(df)) < min(0.9, 0.3 * shift))
-        df.loc[flip, y] = 1
+    else:  # binary outcome: raise the rate inside the batch and lower it outside by the same count,
+           # so the overall prevalence is unchanged and the batch is purely a confounder
+        up = np.where(mask & (df[y] == 0) & (rng.uniform(size=len(df)) < min(0.9, 0.3 * shift)))[0]
+        down_pool = np.where(~mask & (df[y] == 1))[0]
+        down = rng.choice(down_pool, size=min(len(up), len(down_pool)), replace=False)
+        df.loc[df.index[up], y] = 1; df.loc[df.index[down], y] = 0
     return df, {"col": c, "n_in_batch": int(mask.sum()), "shift": shift}

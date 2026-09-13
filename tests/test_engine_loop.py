@@ -74,7 +74,7 @@ def test_crash_is_classified(skill, example):
 
 def test_sweep_finds_knee(skill):
     s = P.sweep(skill, "target_leakage", levels=3)
-    assert len(s["levels"]) == 3 and s["knee_level"] == 0.0 and all(l["class"] == "silent" for l in s["levels"])
+    assert len(s["levels"]) == 3 and s["knee_level"] == 0.0 and s["silent_from"] == 0.0 and all(l["class"] == "silent" for l in s["levels"])
     s2 = P.sweep(skill, "duplicates", levels=3)
     assert s2["knee_level"] is None and (skill / "history" / "sweeps" / "duplicates.json").exists()
 

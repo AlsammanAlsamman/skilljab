@@ -1,0 +1,13 @@
+{"name": "plan_ml_engineer", "persona": "cluster_admin", "constraint": "reproducible",
+ "deliverable": "A scored customer list with churn probability and a feature-importance plot; runs nightly on 2M rows.",
+ "stages": [{"id": "prepare", "name": "schema-validated load, dedupe, encode", "tool": "pandas+pandera", "lang": "python"},
+            {"id": "split", "name": "time-based train/validation split", "tool": "sklearn", "lang": "python"},
+            {"id": "train", "name": "gradient boosting", "tool": "lightgbm", "lang": "python"}],
+ "decisions": [
+  {"id": "missing_handling", "question": "What to do with incomplete rows?", "choice": "impute", "alternatives": ["dropna"], "why": "dropna on 2M rows nightly silently changes the population"},
+  {"id": "feature_selection", "question": "Which columns enter the model?", "choice": "drop post-outcome fields", "alternatives": ["all columns"], "why": "score fields from earlier models leak"},
+  {"id": "encoding", "question": "How to encode categoricals?", "choice": "explicit levels", "alternatives": ["get_dummies drop_first"], "why": "a new plan name at inference must not crash the job"},
+  {"id": "duplicates", "question": "Check for duplicated customers?", "choice": "dedupe on customer_id", "alternatives": ["no"], "why": "billing join"}],
+ "assumptions": ["schema is stable between runs", "categorical levels at inference are a subset of training levels", "charges are in one currency and unit"],
+ "one_check": "row count and churn rate after prepare vs raw",
+ "retraction_notice": "A billing export changed cents to dollars for one region; the model quietly learned that region as 'low charges, low churn'."}

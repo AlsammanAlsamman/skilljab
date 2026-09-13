@@ -1,0 +1,13 @@
+{"name": "plan_statistician", "persona": "statistician", "constraint": "small_n",
+ "deliverable": "Odds ratios with confidence intervals for tenure, charges, tickets and contract, from a pre-specified model.",
+ "stages": [{"id": "audit", "name": "dtype and range audit; missingness by outcome", "tool": "pandas", "lang": "python"},
+            {"id": "prepare", "name": "explicit dummy coding with fixed reference levels", "tool": "pandas", "lang": "python"},
+            {"id": "train", "name": "logistic regression on the pre-specified predictors", "tool": "statsmodels", "lang": "python"}],
+ "decisions": [
+  {"id": "missing_handling", "question": "What to do with incomplete rows?", "choice": "missing-indicator + report missingness by outcome", "alternatives": ["dropna", "impute"], "why": "complete-case analysis is biased when missingness depends on the outcome"},
+  {"id": "feature_selection", "question": "Which columns enter the model?", "choice": "whitelist", "alternatives": ["all columns"], "why": "only variables measured before the churn event; anything else is leakage"},
+  {"id": "encoding", "question": "How to encode categoricals?", "choice": "explicit levels", "alternatives": ["get_dummies drop_first"], "why": "get_dummies on a numeric-as-text column silently one-hots every value"},
+  {"id": "duplicates", "question": "Check for duplicated customers?", "choice": "dedupe on customer_id", "alternatives": ["no"], "why": "joins to billing tables duplicate rows and shrink standard errors"}],
+ "assumptions": ["predictors were measured before the outcome", "one row per customer", "units are consistent within each column", "no separation in the categorical levels"],
+ "one_check": "the missingness rate of every column split by churned vs not",
+ "retraction_notice": "Half the churners were dropped by dropna because their support history had been purged on account closure, so the reported effect of support tickets was in the wrong direction."}

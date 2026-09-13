@@ -121,8 +121,9 @@ def sweep(skill, stone_id, levels=5, after_stage=None, fixed=None, seed=11):
         out["levels"].append({"level": round(float(lv), 3), "dose": dose, "worst_rel_err": v["worst_rel_err"], "class": v["class"],
                               "estimands": {k: {"estimate": e["estimate"], "rel_err": e["rel_err"]} for k, e in v["estimands"].items()},
                               "time_impact": v["time_impact"]})
-    knee = next((l["level"] for l in out["levels"] if l["class"] in ("silent", "crashed")), None)
+    knee = next((l["level"] for l in out["levels"] if l["class"] in ("silent", "caught", "crashed")), None)   # first dose that degrades the result
     out["knee_level"] = knee; out["knee_dose"] = next((l["dose"] for l in out["levels"] if l["level"] == knee), None)
+    out["silent_from"] = next((l["level"] for l in out["levels"] if l["class"] in ("silent", "crashed")), None)  # first dose nothing would catch
     write_json(h / "sweeps" / f"{stone_id}.json", out); return out
 
 def status(skill):

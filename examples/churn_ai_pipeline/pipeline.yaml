@@ -1,0 +1,8 @@
+name: churn
+stages:
+  - id: prepare
+    cmd: "python3 {pipeline_dir}/prepare.py {in} {out}"
+    out: prepared.csv
+  - id: train
+    cmd: "python3 {pipeline_dir}/train.py {in} {out}"
+    out: result.json

@@ -1,0 +1,12 @@
+{
+  "round": 0,
+  "plans": [
+    "plan_grad_student",
+    "plan_statistician",
+    "plan_ml_engineer"
+  ],
+  "question": "failed",
+  "judge_pick": "plan_grad_student",
+  "judge_reason": "Every plan's weakest point compared: grad student trusts all columns and dropna; statistician has no held-out check; ML engineer's time split assumes a timestamp exists. Only the grad student's plan has no defence against leakage or outcome-dependent missingness, and it is the one that shipped.",
+  "culprit": "plan_grad_student"
+}

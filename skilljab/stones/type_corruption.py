@@ -4,7 +4,7 @@ from ._common import pick_col
 
 def apply(df, rng, frac=0.05, col=None):
     df = df.copy(); c = pick_col(df, rng, col)
-    vals = df[c].astype(object).to_numpy()
+    vals = df[c].astype(object).to_numpy().copy()
     mask = rng.uniform(size=len(df)) < frac
     forms = [lambda v: f"{v:,.3f}", lambda v: f" {v:.3f} ", lambda v: "NA", lambda v: f"{v:.3f} "]
     for i in np.where(mask)[0]:

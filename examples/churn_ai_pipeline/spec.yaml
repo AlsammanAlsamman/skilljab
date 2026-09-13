@@ -1,0 +1,24 @@
+# The miniature: a customer table with a planted truth about what drives churn.
+generator: tabular_classification
+n: 1500
+seed: 7
+sizes: [1, 3, 10]
+target_n: 2000000
+features:
+  numeric:
+    tenure_months:   {mean: 24, sd: 12, min: 0, integer: true}
+    monthly_charges: {mean: 70, sd: 25, min: 5}
+    support_tickets: {mean: 1.5, sd: 1.5, min: 0, integer: true}
+  categorical:
+    contract: [month_to_month, one_year, two_year]
+    plan: [basic, standard, premium]
+truth:
+  outcome: churned
+  intercept: -0.2
+  effects:
+    tenure_months:   -0.04     # each month of tenure lowers churn odds by ~4%
+    monthly_charges:  0.012    # higher bills -> more churn
+    support_tickets:  0.35     # each ticket raises churn odds by ~40%
+  cat_effects:
+    contract: {one_year: -0.8, two_year: -1.6}
+tolerance: {relative: 0.30, absolute: 0.01}   # absolute is a floor for near-zero truths; per-dollar coefficients are small

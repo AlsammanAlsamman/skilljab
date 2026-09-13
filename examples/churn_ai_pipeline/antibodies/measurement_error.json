@@ -1,0 +1,15 @@
+{
+  "title": "Tenure is measured with noise",
+  "stage": "train",
+  "node": "feature_selection",
+  "trigger": "no check from the data alone \u2014 needs a gold-standard comparison",
+  "headsup": "tenure_months as recorded (derived from a first-invoice date) disagrees with true tenure by about a standard deviation. Classical measurement error attenuates the coefficient toward zero: the tenure effect came out 70% too small, and the report would rank it below factors it actually beats.",
+  "mitigation": "Validate derived fields against a source of truth on a sample; if noise is known, correct for attenuation or say the effect is a lower bound.",
+  "evidence": "simulated",
+  "provenance": {
+    "round": 10,
+    "stone": "measurement_error",
+    "trick": "stone",
+    "worst_rel_err": 0.7
+  }
+}
