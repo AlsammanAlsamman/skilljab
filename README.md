@@ -90,17 +90,44 @@ The AI knew about all of these. It didn't apply them, because nothing reminded i
 ## ⚙️ How it works
 
 ```mermaid
-flowchart LR
-    A["🌱 Plant a truth<br/>miniature dataset,<br/>known answer"] --> B["✅ Prove recovery<br/>run the pipeline clean"]
-    B --> C["🪨 Throw stones<br/>leak · MNAR · batch ·<br/>units · duplicates …"]
-    C --> D{"result moved<br/>and no check fired?"}
-    D -- "silent failure" --> E["💬 Explain<br/>the AI wakes up:<br/>'oh — this is the HLA region'"]
-    E --> F["🧬 Antibody<br/>checker + fix + heads-up"]
-    F --> G["📜 SKILL.md<br/>loaded every time Claude<br/>touches this analysis"]
-    G -.-> C
-    D -- "caught / harmless" --> H["pass — say nothing"]
-    style D fill:#ff5a4e,color:#fff,stroke:none
-    style G fill:#1b2a4a,color:#fff,stroke:none
+%%{init: {"theme": "base", "themeVariables": {
+  "fontSize": "15px", "primaryColor": "#ffffff", "primaryTextColor": "#1b2a4a", "primaryBorderColor": "#1b2a4a",
+  "lineColor": "#66708a", "edgeLabelBackground": "#f6f4ee"
+}, "flowchart": {"curve": "basis", "nodeSpacing": 40, "rankSpacing": 42}}}%%
+flowchart TB
+    P["🗺️ &nbsp;Plan it N ways<br/>statistician · domain veteran · cluster admin · Reviewer 2"]
+    T["🌱 &nbsp;Plant a truth<br/>a tiny dataset with a known answer"]
+    R["✅ &nbsp;Prove recovery<br/>the pipeline must find what you planted"]
+    ST["🪨 &nbsp;Throw stones<br/>👻 Ghost · 🕰️ Time Traveler · 🌊 Drifter · 👽 Metric Martian …"]
+    Q{"result moved<br/>and no check fired?"}
+    OK["🟢 &nbsp;caught or harmless — pass, say nothing"]
+    X["💬 &nbsp;Explain<br/>the AI wakes up: “oh — this is the HLA region”"]
+    A["🛡️ &nbsp;Antibody<br/>checker · fix · heads-up"]
+    K["📜 &nbsp;SKILL.md<br/>loaded every time Claude touches this analysis"]
+    RUN(["🚀 &nbsp;Run the real thing<br/>a hook warns if the skill has gone stale"])
+
+    P --> T --> R ==> ST --> Q
+    Q -- no --> OK
+    Q == "🔴 silent failure" ==> X --> A --> K
+    K -. "next round, harder stones" .-> ST
+    K ==> RUN
+
+    classDef mini fill:#ffffff,stroke:#1b2a4a,stroke-width:1.5px,color:#1b2a4a
+    classDef jab  fill:#fff4f3,stroke:#ff5a4e,stroke-width:1.5px,color:#1b2a4a
+    classDef ok   fill:#eef8f2,stroke:#2fa36b,stroke-width:1.5px,color:#1b2a4a
+    classDef imm  fill:#1b2a4a,stroke:#1b2a4a,stroke-width:1.5px,color:#ffffff
+    classDef gate fill:#ff5a4e,stroke:#ff5a4e,color:#ffffff
+    classDef run  fill:#f2a93b,stroke:#f2a93b,color:#1b2a4a
+
+    class P,T,R mini
+    class ST jab
+    class OK ok
+    class Q gate
+    class X,A,K imm
+    class RUN run
+    linkStyle default stroke:#66708a,stroke-width:1.5px
+    linkStyle 5 stroke:#ff5a4e,stroke-width:3px
+    linkStyle 9 stroke:#f2a93b,stroke-width:3px
 ```
 
 1. **Plan it several ways.** Planners with different personas — a statistician, a domain veteran, the person who runs the cluster, Reviewer 2 — each write a plan. Where they *disagree* is where the risk lives.
