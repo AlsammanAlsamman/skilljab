@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SkillJab loop</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  html, body { margin: 0; background: #ffffff; }
+  svg { display: block; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .lane-title { font-size: 13px; font-weight: 700; letter-spacing: .14em; fill: #66708a; }
+  .lane-emoji { font-size: 15px; }
+  .title { font-size: 17px; font-weight: 700; }
+  .sub   { font-size: 13px; font-weight: 400; opacity: .82; }
+  .edge-label { font-size: 13px; font-weight: 600; fill: #1b2a4a; }
+  .pill-text { font-size: 15px; font-weight: 700; }
+  .caption { font-size: 12.5px; fill: #66708a; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+// ---------- palette (matches the report) ----------
+const C = { ink:'#1b2a4a', muted:'#66708a', line:'#8a93a8', coral:'#ff5a4e', coralSoft:'#fff1ef',
+            green:'#2fa36b', greenSoft:'#eaf6ef', amber:'#f2a93b', amberSoft:'#fff3dc', lane:'#f7f5ef', laneEdge:'#e6e2d6', white:'#ffffff' };
+
+const W = 1560, H = 700;
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.createElementNS(NS, 'svg');
+svg.setAttribute('xmlns', NS); svg.setAttribute('width', W); svg.setAttribute('height', H); svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+document.getElementById('root').appendChild(svg);
+const el = (tag, attrs = {}, parent = svg) => { const n = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); parent.appendChild(n); return n; };
+const text = (x, y, str, cls, attrs = {}, parent = svg) => { const t = el('text', { x, y, class: cls, ...attrs }, parent); t.textContent = str; return t; };
+
+// ---------- defs: shadow + arrowheads ----------
+const defs = el('defs');
+defs.innerHTML = `
+  <filter id="shadow" x="-10%" y="-10%" width="120%" height="140%">
+    <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#1b2a4a" flood-opacity="0.13"/>
+  </filter>
+  <filter id="shadowDark" x="-10%" y="-10%" width="120%" height="140%">
+    <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#1b2a4a" flood-opacity="0.28"/>
+  </filter>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${C.line}"/></marker>
+  <marker id="arrowCoral" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${C.coral}"/></marker>
+  <marker id="arrowAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${C.amber}"/></marker>
+  <marker id="arrowNavy" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${C.ink}"/></marker>
+  <linearGradient id="navyGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#26385f"/><stop offset="1" stop-color="#1b2a4a"/></linearGradient>
+  <linearGradient id="coralGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff6d62"/><stop offset="1" stop-color="#f0473b"/></linearGradient>
+  <linearGradient id="amberGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f7b955"/><stop offset="1" stop-color="#eb9a25"/></linearGradient>
+`;
+
+// ---------- lanes ----------
+const lanes = [
+  { x: 30,   w: 430, emoji: '🧪', title: 'THE MINIATURE' },
+  { x: 500,  w: 520, emoji: '🥊', title: 'THE JAB' },
+  { x: 1060, w: 470, emoji: '🧬', title: 'THE IMMUNITY' },
+];
+const laneTop = 26, laneH = 590;
+for (const L of lanes) {
+  el('rect', { x: L.x, y: laneTop, width: L.w, height: laneH, rx: 18, fill: C.lane, stroke: C.laneEdge, 'stroke-width': 1 });
+  text(L.x + 22, laneTop + 34, L.emoji, 'lane-emoji');
+  text(L.x + 48, laneTop + 33, L.title, 'lane-title');
+}
+
+// ---------- cards ----------
+function card(x, y, w, h, opts) {
+  const g = el('g', { filter: opts.dark ? 'url(#shadowDark)' : 'url(#shadow)' });
+  el('rect', { x, y, width: w, height: h, rx: 14, fill: opts.fill, stroke: opts.stroke, 'stroke-width': opts.strokeWidth ?? 1.5 }, g);
+  if (opts.accent) el('rect', { x: x, y: y, width: 6, height: h, rx: 3, fill: opts.accent }, g);
+  const color = opts.dark ? C.white : C.ink;
+  text(x + 24, y + 34, opts.emoji, 'title', { 'font-size': 20 }, g);
+  text(x + 56, y + 34, opts.title, 'title', { fill: color }, g);
+  const lines = Array.isArray(opts.sub) ? opts.sub : [opts.sub];
+  lines.forEach((s, i) => text(x + 56, y + 58 + i * 18, s, 'sub', { fill: color }, g));
+  return { x, y, w, h, cx: x + w / 2, cy: y + h / 2, l: [x, y + h / 2], r: [x + w, y + h / 2], t: [x + w / 2, y], b: [x + w / 2, y + h] };
+}
+
+const mini = { fill: C.white, stroke: C.ink };
+const plan  = card(60,  90,  370, 96, { ...mini, emoji: '🗺️', title: 'Plan it N ways',   sub: ['statistician · domain veteran ·', 'cluster admin · Reviewer 2'] });
+const plant = card(60,  228, 370, 96, { ...mini, emoji: '🌱', title: 'Plant a truth',    sub: ['a tiny dataset', 'with a known answer'] });
+const prove = card(60,  366, 370, 96, { ...mini, emoji: '✅', title: 'Prove recovery',   sub: ['the pipeline must find', 'what you planted'] });
+
+const stones = card(560, 90, 400, 96, { fill: C.coralSoft, stroke: C.coral, emoji: '🪨', title: 'Throw stones', sub: ['👻 Ghost · 🕰️ Time Traveler · 🌊 Drifter', '👽 Metric Martian · 👯 Twin · ⌨️ Typo …'] });
+
+// decision diamond
+const D = { cx: 760, cy: 318, r: 82 };
+{
+  const g = el('g', { filter: 'url(#shadowDark)' });
+  el('polygon', { points: `${D.cx},${D.cy - D.r} ${D.cx + D.r * 1.35},${D.cy} ${D.cx},${D.cy + D.r} ${D.cx - D.r * 1.35},${D.cy}`, fill: 'url(#coralGrad)', stroke: 'none' }, g);
+  text(D.cx, D.cy - 6, 'result moved', 'title', { fill: C.white, 'text-anchor': 'middle', 'font-size': 16 }, g);
+  text(D.cx, D.cy + 16, 'and no check fired?', 'title', { fill: C.white, 'text-anchor': 'middle', 'font-size': 16 }, g);
+}
+
+// pass pill
+const pass = { x: 590, y: 470, w: 340, h: 54 };
+{
+  const g = el('g', { filter: 'url(#shadow)' });
+  el('rect', { x: pass.x, y: pass.y, width: pass.w, height: pass.h, rx: 27, fill: C.greenSoft, stroke: C.green, 'stroke-width': 1.5 }, g);
+  text(pass.x + 26, pass.y + 34, '🟢', 'pill-text', { 'font-size': 18 }, g);
+  text(pass.x + 58, pass.y + 28, 'caught or harmless', 'pill-text', { fill: C.ink }, g);
+  text(pass.x + 58, pass.y + 45, 'pass — say nothing', 'sub', { fill: C.ink, 'font-size': 12.5 }, g);
+}
+
+const dark = { fill: 'url(#navyGrad)', stroke: C.ink, dark: true };
+const explain  = card(1100, 90,  400, 96, { ...dark, emoji: '💬', title: 'Explain',  sub: ['the AI wakes up:', '“oh — this is the HLA region”'] });
+const antibody = card(1100, 228, 400, 96, { ...dark, emoji: '🛡️', title: 'Antibody', sub: ['a checker at the stage boundary,', 'a fix, a heads-up'] });
+const skill    = card(1100, 366, 400, 96, { ...dark, emoji: '📜', title: 'SKILL.md', sub: ['loaded every time Claude', 'touches this analysis'] });
+
+// run pill (amber)
+const run = { x: 1100, y: 500, w: 400, h: 60 };
+{
+  const g = el('g', { filter: 'url(#shadowDark)' });
+  el('rect', { x: run.x, y: run.y, width: run.w, height: run.h, rx: 30, fill: 'url(#amberGrad)', stroke: 'none' }, g);
+  text(run.x + 28, run.y + 38, '🚀', 'pill-text', { 'font-size': 20 }, g);
+  text(run.x + 64, run.y + 30, 'Run the real thing', 'pill-text', { fill: C.ink, 'font-size': 16 }, g);
+  text(run.x + 64, run.y + 48, 'a hook warns if the skill has gone stale', 'sub', { fill: C.ink, 'font-size': 12.5 }, g);
+}
+
+// ---------- edges ----------
+function edge(d, opts = {}) {
+  el('path', { d, fill: 'none', stroke: opts.stroke ?? C.line, 'stroke-width': opts.width ?? 2.2, 'stroke-dasharray': opts.dash ?? 'none',
+               'marker-end': `url(#${opts.marker ?? 'arrow'})`, 'stroke-linecap': 'round' });
+}
+function label(x, y, str, opts = {}) {
+  const pad = 8; const t = text(x, y, str, 'edge-label', { 'text-anchor': 'middle', fill: opts.fill ?? C.ink, 'font-size': opts.size ?? 13 });
+  const bb = t.getBBox();
+  const bg = el('rect', { x: bb.x - pad, y: bb.y - 4, width: bb.width + 2 * pad, height: bb.height + 8, rx: 9, fill: opts.bg ?? C.white, stroke: opts.border ?? C.laneEdge });
+  svg.insertBefore(bg, t);
+}
+const vline = (a, b, o) => edge(`M${a.b[0]},${a.b[1] + 2} L${b.t[0]},${b.t[1] - 2}`, o);
+vline(plan, plant); vline(plant, prove);
+// prove -> stones: out of the right side, curving up into the stones card's left
+edge(`M${prove.r[0] + 2},${prove.r[1]} C 500,${prove.r[1]} 500,${stones.l[1]} ${stones.l[0] - 2},${stones.l[1]}`, { marker: 'arrowNavy', stroke: C.ink, width: 2.6 });
+// stones -> decision
+edge(`M${stones.b[0]},${stones.b[1] + 2} L${D.cx},${D.cy - D.r - 3}`);
+// decision -> pass (no)
+edge(`M${D.cx},${D.cy + D.r + 2} L${D.cx},${pass.y - 3}`);
+label(D.cx + 30, D.cy + D.r + 34, 'no');
+// decision -> explain: the one path that matters
+edge(`M${D.cx + D.r * 1.35 + 2},${D.cy} C 1000,${D.cy} 1000,${explain.l[1]} ${explain.l[0] - 3},${explain.l[1]}`, { stroke: C.coral, width: 4, marker: 'arrowCoral' });
+label(1015, 222, '🔴 silent failure', { bg: C.coralSoft, border: C.coral, size: 14 });
+// explain -> antibody -> skill
+vline(explain, antibody, { stroke: C.ink, marker: 'arrowNavy' }); vline(antibody, skill, { stroke: C.ink, marker: 'arrowNavy' });
+// skill -> run
+edge(`M${skill.b[0]},${skill.b[1] + 2} L${run.x + run.w / 2},${run.y - 3}`, { stroke: C.amber, width: 3.5, marker: 'arrowAmber' });
+// skill -> stones: dashed loop, up the right margin of lane 2 and into the stones card's right side
+edge(`M${skill.l[0] - 2},${skill.l[1] + 20} C 1040,${skill.l[1] + 20} 1040,${stones.r[1] + 30} ${stones.r[0] + 3},${stones.r[1] + 30}`, { dash: '7 7', stroke: C.muted, width: 2 });
+label(985, 458, 'next round, harder stones', { fill: C.muted, size: 12.5 });
+
+// ---------- caption ----------
+text(30, H - 34, 'Elicitation proposes; simulation disposes. Only a stone that breaks the miniature — or something you recognized yourself — earns a place in the skill.', 'caption', { fill: C.muted, 'font-size': 13 });
+document.title = 'READY';
+</script>
+</body>
+</html>

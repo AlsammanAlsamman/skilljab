@@ -89,46 +89,7 @@ The AI knew about all of these. It didn't apply them, because nothing reminded i
 
 ## ⚙️ How it works
 
-```mermaid
-%%{init: {"theme": "base", "themeVariables": {
-  "fontSize": "15px", "primaryColor": "#ffffff", "primaryTextColor": "#1b2a4a", "primaryBorderColor": "#1b2a4a",
-  "lineColor": "#66708a", "edgeLabelBackground": "#f6f4ee"
-}, "flowchart": {"curve": "basis", "nodeSpacing": 40, "rankSpacing": 42}}}%%
-flowchart TB
-    P["🗺️ &nbsp;Plan it N ways<br/>statistician · domain veteran · cluster admin · Reviewer 2"]
-    T["🌱 &nbsp;Plant a truth<br/>a tiny dataset with a known answer"]
-    R["✅ &nbsp;Prove recovery<br/>the pipeline must find what you planted"]
-    ST["🪨 &nbsp;Throw stones<br/>👻 Ghost · 🕰️ Time Traveler · 🌊 Drifter · 👽 Metric Martian …"]
-    Q{"result moved<br/>and no check fired?"}
-    OK["🟢 &nbsp;caught or harmless — pass, say nothing"]
-    X["💬 &nbsp;Explain<br/>the AI wakes up: “oh — this is the HLA region”"]
-    A["🛡️ &nbsp;Antibody<br/>checker · fix · heads-up"]
-    K["📜 &nbsp;SKILL.md<br/>loaded every time Claude touches this analysis"]
-    RUN(["🚀 &nbsp;Run the real thing<br/>a hook warns if the skill has gone stale"])
-
-    P --> T --> R ==> ST --> Q
-    Q -- no --> OK
-    Q == "🔴 silent failure" ==> X --> A --> K
-    K -. "next round, harder stones" .-> ST
-    K ==> RUN
-
-    classDef mini fill:#ffffff,stroke:#1b2a4a,stroke-width:1.5px,color:#1b2a4a
-    classDef jab  fill:#fff4f3,stroke:#ff5a4e,stroke-width:1.5px,color:#1b2a4a
-    classDef ok   fill:#eef8f2,stroke:#2fa36b,stroke-width:1.5px,color:#1b2a4a
-    classDef imm  fill:#1b2a4a,stroke:#1b2a4a,stroke-width:1.5px,color:#ffffff
-    classDef gate fill:#ff5a4e,stroke:#ff5a4e,color:#ffffff
-    classDef run  fill:#f2a93b,stroke:#f2a93b,color:#1b2a4a
-
-    class P,T,R mini
-    class ST jab
-    class OK ok
-    class Q gate
-    class X,A,K imm
-    class RUN run
-    linkStyle default stroke:#66708a,stroke-width:1.5px
-    linkStyle 5 stroke:#ff5a4e,stroke-width:3px
-    linkStyle 9 stroke:#f2a93b,stroke-width:3px
-```
+<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/flowchart/skilljab-loop.png" alt="The SkillJab loop: plan it N ways, plant a truth, prove recovery → throw stones → did the result move with no check firing? → silent failure → explain (the AI wakes up), antibody, SKILL.md → run the real thing; next round, harder stones" width="1000"></p>
 
 1. **Plan it several ways.** Planners with different personas — a statistician, a domain veteran, the person who runs the cluster, Reviewer 2 — each write a plan. Where they *disagree* is where the risk lives.
 2. **Plant a truth and prove recovery.** A tiny dataset with a known answer, the whole pipeline run on it. If the answer doesn't come back, the pipeline is wrong before any real data.
@@ -368,6 +329,7 @@ claude plugin validate plugin --strict
 skilljab/            engine: simulate · stones/ · inject · runner · check · project · plandiff · tree · lineup · timing · render_skill · graveyard · report · pack/
 plugin/              Claude Code plugin: commands/ · agents/ · skills/skilljab-core · hooks/
 examples/            churn_ai_pipeline — the test above, replayable · toy_regression — the minimal example the tests use
+assets/flowchart/    the loop diagram — hand-drawn SVG in JavaScript, rendered to PNG by scripts/render_flowchart.sh
 docs/DESIGN.md       the design and the reasoning behind every choice
 docs/sessions/       transcripts of the design discussions
 ```
