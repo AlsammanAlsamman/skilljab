@@ -1,0 +1,40 @@
+# Blurry-friend symptom grammar. Domain-neutral templates; cross them with each stage and make
+# the model enumerate the neighbourhood. Blur is a dose: sweet spot = symptom + location + one attribute.
+templates:
+  - id: slow
+    text: "At {stage} it was much slower than expected."
+  - id: warning_input
+    text: "At {stage} something printed a warning that mentioned the input, but I can't find the message."
+  - id: warning_param
+    text: "At {stage} there was a warning about a parameter or a default value."
+  - id: warning_shape
+    text: "At {stage} something complained about shapes, sizes, or a mismatch in counts."
+  - id: warning_memory
+    text: "At {stage} memory use jumped, or something about allocation appeared in the log."
+  - id: warning_convergence
+    text: "At {stage} a message mentioned convergence, iterations, or a singular/ill-conditioned matrix."
+  - id: too_clean
+    text: "The result after {stage} looked too clean — suspiciously tidy."
+  - id: too_good
+    text: "The result after {stage} was better than anyone expected."
+  - id: flipped
+    text: "After {stage} the sign or direction of the main effect flipped compared to an earlier run."
+  - id: noisy
+    text: "After {stage} the numbers were noisier than the pilot suggested."
+  - id: rerun_changed
+    text: "Re-running {stage} changed the numbers slightly without any code change."
+  - id: reorder_changed
+    text: "After sorting or re-ordering the input, {stage} gave different results."
+  - id: subset_changed
+    text: "On a subset, {stage} gave a different answer than on the full data."
+  - id: colleague_changed
+    text: "A colleague ran {stage} on their machine and got something different."
+  - id: senior_frowned
+    text: "Someone senior frowned at the {artifact} after {stage} but didn't say why."
+  - id: count_off
+    text: "The row or sample count after {stage} was a little off from what it should be."
+artifacts: [figure, table, count, summary]
+instructions: >
+  For each (stage, template) that is plausible for this pipeline, enumerate 3-6 concrete candidate
+  causes. Be specific to the domain and the tools named in the pipeline. Then map each candidate
+  to a stone from the catalog (or 'none' if no generic stone reproduces it). Output candidates.json.

@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkillJab crash test</title>
+<style>
+  :root { --bg:#f6f4ee; --ink:#1b2a4a; --muted:#66708a; --card:#ffffff; --line:#e4e1d8;
+          --coral:#ff5a4e; --green:#2fa36b; --grey:#b8bcc8; --amber:#f2a93b; --navy:#1b2a4a; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#141a26; --ink:#eef0f5; --muted:#9aa3b8; --card:#1d2434; --line:#2c3447; --grey:#5a6274; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; padding:24px 16px 64px; }
+  .wrap { max-width:1100px; margin:0 auto; }
+  h1 { font-size:26px; margin:0 0 4px; } h2 { font-size:17px; margin:32px 0 10px; } h3 { font-size:14px; margin:0 0 6px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+  .sub { color:var(--muted); margin:0 0 18px; }
+  .hero { background:var(--navy); color:#fff; border-radius:14px; padding:22px 24px; display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
+  .hero .badge { font-size:52px; line-height:1; }
+  .hero .head { font-size:18px; font-weight:650; margin:0 0 4px; }
+  .hero .meta { opacity:.8; font-size:13px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .stars { font-size:20px; letter-spacing:2px; color:var(--amber); }
+  .stage-name { font-weight:650; font-size:15px; }
+  .kv { color:var(--muted); font-size:12.5px; margin-top:6px; }
+  .tag { display:inline-block; padding:2px 8px; border-radius:999px; font-size:11.5px; font-weight:600; color:#fff; }
+  .silent { background:var(--coral); } .crashed { background:#8b1e14; } .caught { background:var(--green); } .harmless { background:var(--grey); } .false_alarm { background:var(--amber); }
+  table { border-collapse:collapse; width:100%; font-size:13px; } th, td { padding:7px 9px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+  th { color:var(--muted); font-weight:600; font-size:12px; }
+  .matrix td.cell { text-align:center; } .cell span { display:inline-block; min-width:54px; padding:3px 6px; border-radius:6px; color:#fff; font-weight:600; font-size:12px; }
+  .scroll { overflow-x:auto; }
+  svg text { fill:var(--ink); font-size:11px; } svg .axis { stroke:var(--line); } svg .grid { stroke:var(--line); stroke-dasharray:2 3; }
+  .legend { font-size:12px; color:var(--muted); display:flex; gap:14px; flex-wrap:wrap; margin-top:6px; }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; vertical-align:middle; }
+  .bar { height:16px; border-radius:4px; background:var(--navy); position:relative; }
+  .bar .rng { position:absolute; top:0; bottom:0; background:rgba(255,90,78,.45); border-radius:4px; }
+  input[type=range] { width:100%; }
+  .twin { display:grid; grid-template-columns:1fr; gap:10px; }
+  .estrow { display:grid; grid-template-columns:120px 1fr 90px; gap:10px; align-items:center; font-size:13px; }
+  .track { position:relative; height:22px; background:var(--line); border-radius:6px; }
+  .track .truth { position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--green); }
+  .track .est { position:absolute; top:4px; height:14px; width:14px; border-radius:50%; background:var(--coral); transform:translateX(-7px); transition:left .15s; }
+  .track .tol { position:absolute; top:0; bottom:0; background:rgba(47,163,107,.18); }
+  .small { font-size:12px; color:var(--muted); }
+  .empty { color:var(--muted); font-style:italic; }
+  .card-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:6px; }
+  .vc { text-align:center; padding:8px 4px; border-radius:8px; font-size:12px; color:#fff; font-weight:600; }
+  footer { margin-top:40px; color:var(--muted); font-size:12px; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const DATA = /*__SKILLJAB_DATA__*/null;
+const CLS = {silent:'var(--coral)', crashed:'#8b1e14', caught:'var(--green)', harmless:'var(--grey)', false_alarm:'var(--amber)'};
+const $ = (h) => { const t = document.createElement('template'); t.innerHTML = h.trim(); return t.content.firstChild; };
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pct = (x) => x == null ? '—' : (x*100).toFixed(0) + '%';
+const human = (s) => s == null ? '—' : s < 60 ? s.toFixed(1)+'s' : s < 3600 ? (s/60).toFixed(1)+'m' : (s/3600).toFixed(1)+'h';
+const stars = (n) => '★'.repeat(n) + '☆'.repeat(5-n);
+
+function hero(d) {
+  const silent = d.rounds.filter(r => r.class === 'silent' || r.class === 'crashed').length;
+  const badge = d.rounds.length === 0 ? '🧪' : silent ? '💥' : '🛡️';
+  return $(`<div class="hero"><div class="badge">${badge}</div><div>
+    <p class="head">${esc(d.headline)}</p>
+    <div class="meta">${esc(d.name)} · skill v${d.version} · ${d.rounds.length} stone hit(s) across ${new Set(d.rounds.map(r=>r.round)).size} round(s) · ${silent} silent · generated ${esc(d.generated)}</div>
+  </div></div>`);
+}
+
+function stageCards(d) {
+  const g = $(`<div class="grid"></div>`);
+  if (!d.stage_ids.length) { g.appendChild($(`<div class="empty">No baseline run yet.</div>`)); return g; }
+  d.stage_ids.forEach(sid => {
+    const s = d.stages[sid] || {};
+    const t = d.timing && d.timing.stages && d.timing.stages[sid];
+    g.appendChild($(`<div class="card">
+      <div class="stage-name">${esc(sid)}</div>
+      <div class="stars" title="${s.n_stones||0} stones, ${s.silent||0} silent">${stars(s.stars ?? 5)}</div>
+      <div class="kv">${s.n_stones||0} stones · <b style="color:var(--coral)">${s.silent||0} silent</b> · ${s.caught||0} caught · ${s.harmless||0} harmless${s.crashed?` · ${s.crashed} crashed`:''}</div>
+      <div class="kv">worst error ${pct(s.worst_rel_err)} · baseline ${human(s.baseline_seconds)}${t ? ` · predicted <b>${human(t.seconds)}</b> (${t.model})` : ''}</div>
+    </div>`));
+  });
+  return g;
+}
+
+function twin(d) {
+  const card = $(`<div class="card"></div>`);
+  const sw = d.sweeps;
+  const names = Object.keys(d.truth);
+  if (!names.length) { card.appendChild($(`<div class="empty">No planted truth found.</div>`)); return card; }
+  const sel = $(`<select></select>`);
+  const src = sw.length ? sw : null;
+  (src || []).forEach((s, i) => sel.appendChild($(`<option value="${i}">${esc(s.character)} (${esc(s.stone)})</option>`)));
+  const slider = $(`<input type="range" min="0" max="100" value="0">`);
+  const label = $(`<div class="small"></div>`);
+  const rows = $(`<div class="twin"></div>`);
+  const tolRel = d.tolerance.relative ?? 0.25, tolAbs = d.tolerance.absolute ?? 0.1;
+  function draw() {
+    rows.innerHTML = '';
+    const s = src ? src[+sel.value] : null;
+    let pt = null;
+    if (s && s.levels.length) {
+      const lv = +slider.value / 100;
+      pt = s.levels.reduce((a, b) => Math.abs(b.level - lv) < Math.abs(a.level - lv) ? b : a);
+      label.innerHTML = `dose level <b>${(pt.level*100).toFixed(0)}%</b> · ${esc(JSON.stringify(pt.dose))} · result <span class="tag ${pt.class}">${pt.class}</span>${pt.class==='silent'?' — <b>nothing would have warned you</b>':''}`;
+    } else label.textContent = src ? '' : 'No dose sweeps yet — run `skilljab sweep` to enable the slider. Showing the baseline.';
+    names.forEach(n => {
+      const tv = d.truth[n];
+      const e = pt ? (pt.estimands && pt.estimands[n] ? pt.estimands[n].estimate : null) : (d.rounds.length && d.rounds[0].estimands[n] ? d.rounds[0].estimands[n].estimate : tv);
+      const span = Math.max(Math.abs(tv) * 2.5, 1.5), lo = tv - span, hi = tv + span;
+      const x = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+      const tol = Math.max(tolAbs, Math.abs(tv) * tolRel);
+      rows.appendChild($(`<div class="estrow"><div><b>${esc(n)}</b><div class="small">truth ${(+tv).toFixed(3)}</div></div>
+        <div class="track"><div class="tol" style="left:${x(tv-tol)}%;width:${x(tv+tol)-x(tv-tol)}%"></div><div class="truth" style="left:${x(tv)}%"></div>${e==null?'':`<div class="est" style="left:${x(e)}%"></div>`}</div>
+        <div>${e==null?'<span class="tag crashed">no result</span>':(+e).toFixed(3)}</div></div>`));
+    });
+  }
+  card.appendChild($(`<h3>Twin result — drag the dose, watch your estimates move</h3>`));
+  if (src) { card.appendChild(sel); card.appendChild(slider); }
+  card.appendChild(label); card.appendChild(rows);
+  card.appendChild($(`<div class="legend"><span><span class="dot" style="background:var(--green)"></span>planted truth (band = tolerance)</span><span><span class="dot" style="background:var(--coral)"></span>what your pipeline recovered</span></div>`));
+  sel.onchange = draw; slider.oninput = draw; draw();
+  return card;
+}
+
+function curves(d) {
+  const card = $(`<div class="card"></div>`);
+  card.appendChild($(`<h3>Breaking-point curves — dose vs error, the knee is the fragility</h3>`));
+  if (!d.sweeps.length) { card.appendChild($(`<div class="empty">No sweeps yet.</div>`)); return card; }
+  const W = 720, H = 240, P = {l:44, r:16, t:12, b:30};
+  const tolRel = d.tolerance.relative ?? 0.25;
+  const maxErr = Math.max(tolRel*2, ...d.sweeps.flatMap(s => s.levels.map(l => l.worst_rel_err ?? 0))) * 1.1;
+  const xs = v => P.l + v * (W - P.l - P.r), ys = v => H - P.b - Math.min(v, maxErr) / maxErr * (H - P.t - P.b);
+  const cols = ['#ff5a4e','#1b7fd6','#2fa36b','#f2a93b','#8e44ad','#16a085','#c0392b','#7f8c8d','#d35400','#2c3e50','#27ae60'];
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px">`;
+  [0, .25, .5, .75, 1].forEach(f => { const y = ys(f*maxErr); svg += `<line class="grid" x1="${P.l}" x2="${W-P.r}" y1="${y}" y2="${y}"/><text x="4" y="${y+4}">${(f*maxErr*100).toFixed(0)}%</text>`; });
+  svg += `<line x1="${P.l}" x2="${W-P.r}" y1="${ys(tolRel)}" y2="${ys(tolRel)}" stroke="var(--green)" stroke-dasharray="4 3"/><text x="${W-P.r-70}" y="${ys(tolRel)-4}" fill="var(--green)">tolerance</text>`;
+  [0,.5,1].forEach(f => svg += `<text x="${xs(f)-8}" y="${H-8}">${f*100}%</text>`);
+  svg += `<text x="${W/2-20}" y="${H-8}" style="opacity:.6">dose</text>`;
+  d.sweeps.forEach((s, i) => {
+    const pts = s.levels.map(l => `${xs(l.level)},${ys(l.worst_rel_err ?? maxErr)}`).join(' ');
+    svg += `<polyline fill="none" stroke="${cols[i%cols.length]}" stroke-width="2.2" points="${pts}"/>`;
+    s.levels.forEach(l => svg += `<circle cx="${xs(l.level)}" cy="${ys(l.worst_rel_err ?? maxErr)}" r="4" fill="${CLS[l.class]||'#999'}" stroke="${cols[i%cols.length]}" stroke-width="1.5"><title>${esc(s.character)} @ ${(l.level*100).toFixed(0)}%: ${pct(l.worst_rel_err)} (${l.class})</title></circle>`);
+  });
+  svg += `</svg>`;
+  card.appendChild($(`<div class="scroll">${svg}</div>`));
+  const lg = $(`<div class="legend"></div>`);
+  d.sweeps.forEach((s, i) => lg.appendChild($(`<span><span class="dot" style="background:${cols[i%cols.length]}"></span>${esc(s.character)} · knee ${s.knee_level==null?'none':(s.knee_level*100).toFixed(0)+'%'}</span>`)));
+  lg.appendChild($(`<span>dots: <span class="dot" style="background:var(--coral)"></span>silent <span class="dot" style="background:var(--green)"></span>caught <span class="dot" style="background:var(--grey)"></span>harmless</span>`));
+  card.appendChild(lg);
+  return card;
+}
+
+function matrix(d) {
+  const card = $(`<div class="card"></div>`);
+  card.appendChild($(`<h3>Fragility matrix — stone × stage (worst outcome seen)</h3>`));
+  if (!d.rounds.length) { card.appendChild($(`<div class="empty">No rounds yet.</div>`)); return card; }
+  const rank = {crashed:5, silent:4, caught:3, false_alarm:2, harmless:1};
+  const cell = {};
+  d.rounds.forEach(r => { if (!r.stone) return; const k = r.stone+'|'+r.stage; if (!cell[k] || rank[r.class] > rank[cell[k].class] || (rank[r.class]===rank[cell[k].class] && (r.worst_rel_err||0) > (cell[k].worst_rel_err||0))) cell[k] = r; });
+  let h = `<div class="scroll"><table class="matrix"><tr><th>stone</th>${d.stage_ids.map(s=>`<th>${esc(s)}</th>`).join('')}</tr>`;
+  d.stone_stages.forEach(st => {
+    h += `<tr><td><b>${esc(d.stone_characters[st]||st)}</b><div class="small">${esc(st)}</div></td>`;
+    d.stage_ids.forEach(sid => { const c = cell[st+'|'+sid]; h += `<td class="cell">${c ? `<span style="background:${CLS[c.class]}" title="round ${c.round} · ${esc(JSON.stringify(c.dose))}${c.time_impact&&c.time_impact[sid]?` · ${c.time_impact[sid]}x time`:''}">${pct(c.worst_rel_err)}${c.time_impact&&c.time_impact[sid]&&c.time_impact[sid]>1.5?' ⏱':''}</span>` : '<span class="small">·</span>'}</td>`; });
+    h += `</tr>`;
+  });
+  h += `</table></div>`;
+  card.appendChild($(h));
+  card.appendChild($(`<div class="legend"><span><span class="dot" style="background:var(--coral)"></span>silent — degraded, no check fired</span><span><span class="dot" style="background:#8b1e14"></span>crashed</span><span><span class="dot" style="background:var(--green)"></span>caught</span><span><span class="dot" style="background:var(--amber)"></span>false alarm</span><span><span class="dot" style="background:var(--grey)"></span>harmless</span><span>⏱ = stage ≥1.5× slower</span></div>`));
+  return card;
+}
+
+function timing(d) {
+  const card = $(`<div class="card"></div>`);
+  card.appendChild($(`<h3>Lap times — predicted runtime per stage at N = ${d.timing ? d.timing.target_n.toLocaleString() : '?'}</h3>`));
+  if (!d.timing) { card.appendChild($(`<div class="empty">No timing fit yet — run the pipeline at 3 sizes and \`skilljab timing fit\`.</div>`)); return card; }
+  const t = d.timing; const max = Math.max(...Object.values(t.stages).map(s => s.seconds_range[1]), 1);
+  const silentCost = d.rounds.filter(r => r.class==='silent').map(r => r.stage);
+  Object.entries(t.stages).forEach(([sid, s]) => {
+    const w = s.seconds / max * 100, lo = s.seconds_range[0] / max * 100, hi = s.seconds_range[1] / max * 100;
+    card.appendChild($(`<div style="margin:8px 0"><div class="estrow" style="grid-template-columns:110px 1fr 150px"><div><b>${esc(sid)}</b><div class="small">${s.model}${s.superlinear?' ⚠':''}</div></div>
+      <div class="bar" style="width:100%;background:var(--line)"><div style="position:absolute;left:0;top:0;bottom:0;width:${w}%;background:var(--navy);border-radius:4px"></div><div class="rng" style="left:${lo}%;width:${Math.max(0,hi-lo)}%"></div></div>
+      <div><b>${human(s.seconds)}</b> <span class="small">(${human(s.seconds_range[0])}–${human(s.seconds_range[1])})</span></div></div>
+      ${s.flags.map(f=>`<div class="small" style="color:var(--coral)">⚠ ${esc(f)}</div>`).join('')}
+      ${silentCost.includes(sid)?`<div class="small" style="color:var(--coral)">a silent failure here would surface only after ~${human(Object.entries(t.stages).filter(([k])=>d.stage_ids.indexOf(k)<=d.stage_ids.indexOf(sid)).reduce((a,[,v])=>a+v.seconds,0))} of compute</div>`:''}</div>`));
+  });
+  card.appendChild($(`<div class="small" style="margin-top:8px">Total ≈ <b>${human(t.total_seconds)}</b> (${human(t.total_range[0])}–${human(t.total_range[1])}).${t.checkpoint_before?` <b>Checkpoint before \`${esc(t.checkpoint_before)}\`</b> — ${esc(t.checkpoint_reason)}.`:''}${t.low_confidence?' <span style="color:var(--amber)">Only 2 sizes measured — low confidence.</span>':''} Extrapolation is the least trustworthy number on this page; treat ranges as optimistic.</div>`));
+  return card;
+}
+
+function vaccination(d) {
+  const card = $(`<div class="card"></div>`);
+  card.appendChild($(`<h3>Vaccination card — rounds × stones, red turning green is the skill learning</h3>`));
+  const rounds = [...new Set(d.rounds.map(r => r.round))].sort((a,b)=>a-b);
+  if (!rounds.length) { card.appendChild($(`<div class="empty">No rounds yet.</div>`)); return card; }
+  let h = `<div class="scroll"><table><tr><th>stone</th>${rounds.map(r=>`<th>round ${r}</th>`).join('')}</tr>`;
+  d.stone_stages.forEach(st => {
+    h += `<tr><td><b>${esc(d.stone_characters[st]||st)}</b></td>`;
+    rounds.forEach(r => { const hits = d.rounds.filter(x => x.round===r && x.stone===st); const worst = hits.sort((a,b)=>({crashed:5,silent:4,caught:3,false_alarm:2,harmless:1}[b.class]-{crashed:5,silent:4,caught:3,false_alarm:2,harmless:1}[a.class]))[0];
+      h += `<td>${worst?`<span class="tag ${worst.class}">${worst.class}</span>`:'<span class="small">·</span>'}</td>`; });
+    h += `</tr>`;
+  });
+  h += `</table></div>`;
+  card.appendChild($(h));
+  if (d.antibodies.length) {
+    const ul = $(`<div style="margin-top:10px"></div>`);
+    ul.appendChild($(`<div class="small"><b>Antibodies (${d.antibodies.length})</b></div>`));
+    d.antibodies.forEach(a => ul.appendChild($(`<div class="small">• ${esc(a.id)} ${esc(a.title)} — stage ${esc(a.stage)} · ${esc(a.evidence)}${a.provenance&&a.provenance.round!=null?` · round ${a.provenance.round}`:''}</div>`)));
+    card.appendChild(ul);
+  }
+  if (d.lineup && d.lineup.n_scored) card.appendChild($(`<div class="small" style="margin-top:8px">Judge calibration: ${d.lineup.hits}/${d.lineup.n_scored} lineups correct (${pct(d.lineup.hit_rate)}).</div>`));
+  return card;
+}
+
+(function main() {
+  const app = document.getElementById('app');
+  if (!DATA) { app.appendChild($(`<div class="empty">No data embedded.</div>`)); return; }
+  app.appendChild($(`<h1>🥊 SkillJab crash test · ${esc(DATA.name)}</h1>`));
+  app.appendChild($(`<p class="sub">Your pipeline was sabotaged on a miniature with a planted truth. Red means the result broke and nothing told you.</p>`));
+  app.appendChild(hero(DATA));
+  app.appendChild($(`<h2>Star rating per stage</h2>`)); app.appendChild(stageCards(DATA));
+  app.appendChild($(`<h2>Slow-motion replay</h2>`)); app.appendChild(twin(DATA));
+  app.appendChild($(`<h2>Where it breaks</h2>`)); app.appendChild(curves(DATA));
+  app.appendChild($(`<h2>Impact points</h2>`)); app.appendChild(matrix(DATA));
+  app.appendChild($(`<h2>Lap times</h2>`)); app.appendChild(timing(DATA));
+  app.appendChild($(`<h2>Immunity record</h2>`)); app.appendChild(vaccination(DATA));
+  app.appendChild($(`<footer>Rendered by SkillJab v${esc(DATA.version)} skill · ${esc(DATA.generated)} · self-contained, no external requests.</footer>`));
+})();
+</script>
+</body>
+</html>

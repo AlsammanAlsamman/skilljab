@@ -1,0 +1,10 @@
+generator: tabular_regression
+n: 400
+seed: 42
+sizes: [1, 3, 10]
+features: {numeric: 4, categorical: 1, categories: 3}
+truth:
+  intercept: 1.0
+  noise_sd: 1.0
+  effects: {x1: 0.8, x2: -0.5, x3: 0.0}
+tolerance: {relative: 0.25, absolute: 0.1}

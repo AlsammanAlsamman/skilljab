@@ -1,0 +1,10 @@
+# A deliberately naive regression pipeline: drop NA rows, then OLS on every column that
+# starts with "x". It is exactly the kind of plausible-but-fragile thing SkillJab exists for.
+name: toy_regression
+stages:
+  - id: clean
+    cmd: "python3 {pipeline_dir}/clean.py {in} {out}"
+    out: clean.csv
+  - id: fit
+    cmd: "python3 {pipeline_dir}/fit.py {in} {out}"
+    out: result.json

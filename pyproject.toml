@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "skilljab"
+version = "0.1.0"
+description = "Immunize an analysis by sabotaging it before it sees real data - and keep the antibodies as a skill."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Samman Mahmoud"}]
+dependencies = ["numpy>=1.24", "pandas>=2.0", "pyyaml>=6.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+skilljab = "skilljab.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["skilljab*"]
+
+[tool.setuptools.package-data]
+skilljab = ["stones/catalog.yaml", "pack/*.yaml", "pack/diversity/*.yaml", "pack/graveyard/*.json", "report_assets/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
