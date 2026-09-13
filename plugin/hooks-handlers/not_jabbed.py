@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """PreToolUse hook: when a Bash command looks like it runs a jabbed pipeline for real, warn if
 the skill is stale (pipeline changed since baseline, or last round not clean). Never blocks."""
-import json, sys, subprocess, pathlib, re
+import json, sys, subprocess, pathlib, re, shutil
 
 def main():
     try:
@@ -28,7 +28,9 @@ def main():
         if not mentions:
             continue
         try:
-            out = subprocess.run([sys.executable, "-m", "skilljab.cli", "status", "--skill", str(sd)], capture_output=True, text=True, timeout=20)
+            exe = shutil.which("skilljab")
+            argv = [exe, "status", "--skill", str(sd)] if exe else [sys.executable, "-m", "skilljab.cli", "status", "--skill", str(sd)]
+            out = subprocess.run(argv, capture_output=True, text=True, timeout=20)
             s = json.loads(out.stdout or "{}")
         except Exception:
             continue

@@ -102,8 +102,9 @@ def test_report_renders_from_history(skill):
         subprocess.run([node, "-e", "new Function(process.argv[1])", js], check=True)
 
 def test_cli_smoke(skill, example):
+    env = {**__import__("os").environ, "PYTHONPATH": str(pathlib.Path(__file__).resolve().parent.parent)}
     def cli(*args):
-        p = subprocess.run([sys.executable, "-m", "skilljab.cli", *args], capture_output=True, text=True, cwd=example)
+        p = subprocess.run([sys.executable, "-m", "skilljab.cli", *args], capture_output=True, text=True, cwd=example, env=env)
         return p.returncode, p.stdout
     rc, out = cli("stones", "list"); assert rc == 0 and "correlated_block" in out
     rc, out = cli("stones", "show", "outliers"); assert rc == 0 and "wakeup_hint" not in out
