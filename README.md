@@ -1,166 +1,297 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/icon/skilljab-icon-512.png" alt="SkillJab mascot — a winking syringe with a boxing glove, jabbing a bar chart" width="220">
+  <img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/icon/skilljab-icon-512.png" alt="SkillJab mascot — a winking syringe with a boxing glove, jabbing a bar chart" width="200">
 </p>
 
 <h1 align="center">SkillJab</h1>
 
-<p align="center"><b>Your AI writes the analysis. SkillJab makes sure it's right before you spend the six hours finding out.</b></p>
+<p align="center">
+  <b>Your AI writes the analysis. SkillJab makes sure it's right before you spend the six hours finding out.</b>
+</p>
 
 <p align="center">
-  <a href="https://pypi.org/project/skilljab/"><code>pipx install skilljab</code></a> · a Claude Code plugin + CLI · for people who do data analysis with an AI at their side
+  <a href="https://pypi.org/project/skilljab/"><img alt="PyPI" src="https://img.shields.io/pypi/v/skilljab?color=ff5a4e&label=pypi"></a>
+  <a href="https://pypi.org/project/skilljab/"><img alt="Python" src="https://img.shields.io/pypi/pyversions/skilljab?color=1b2a4a"></a>
+  <img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude%20Code-plugin-1b2a4a">
+  <img alt="tests" src="https://img.shields.io/badge/tests-47%20passing-2fa36b">
+  <a href="LICENSE"><img alt="MIT" src="https://img.shields.io/badge/license-MIT-lightgrey"></a>
+</p>
+
+<p align="center">
+  <code>pipx install skilljab</code> &nbsp;·&nbsp; <code>claude --plugin-dir ./plugin</code> &nbsp;·&nbsp; <code>/skilljab:jab</code>
+</p>
+
+<p align="center">
+  <a href="#-see-it-work">See it work</a> ·
+  <a href="#-why">Why</a> ·
+  <a href="#-how-it-works">How it works</a> ·
+  <a href="#-the-report">The report</a> ·
+  <a href="#-install">Install</a> ·
+  <a href="#-what-you-get">What you get</a> ·
+  <a href="#-under-the-hood">Under the hood</a> ·
+  <a href="#-the-stones">The stones</a> ·
+  <a href="#-limits">Limits</a>
 </p>
 
 ---
 
-## The problem you already have
+**SkillJab** is a Claude Code plugin and CLI for people who do data analysis with an AI at their side. It builds a *miniature* of your analysis with a **planted truth**, sabotages it with realistic perturbations, and shows you the failures **nothing would have warned you about** — then turns every one of them into a checker, a fix, and a heads-up inside a `SKILL.md` that Claude loads whenever it touches that analysis again.
 
-You ask Claude to write your pipeline. It writes clean, competent code. You run it on the real data, wait hours, and the result is wrong — because of something that was *known*: the region where every variant is correlated, the column that was secretly computed from the outcome, the join that doubled half the rows, the spreadsheet that exported `1,234` as text.
+- 🧪 **Proves** your pipeline can recover a truth you planted — before any real data
+- 🥊 **Finds the silent failures** — the result moved and no check fired
+- 🧬 **Keeps the antibodies** — your AI gets better at *your* pipeline, permanently, with the reason on record
+- 📊 **Crash-test report** — where it's strong, where it's fragile, how long it will take at full size
+
+<br>
+
+## 🎯 See it work
+
+> **The prompt:** *"Here's a CSV of our customers — tenure, monthly charges, support tickets, contract, plan, churned. Build a churn model and tell me which factors matter."*
+
+Claude wrote `dropna` → `get_dummies` → logistic regression on every column. Clean, idiomatic code. On clean data it recovers every planted effect — AUC 0.73, factors ranked correctly. **Nothing looks wrong.**
+
+Then SkillJab threw ten stones at it, one per round, each a thing that happens to real customer tables. **Eight broke the answer, and nothing warned anyone:**
+
+| what a real table does | what the AI's pipeline reported | warned? |
+|---|---|:---:|
+| a `churn_score_v1` column from an earlier model | AUC 1.0 — "nothing matters except the score" | ❌ |
+| `monthly_charges` exported as text (`'1,234.50'`) | `get_dummies` made 1,400 columns; the price coefficient vanished | ❌ |
+| support history purged for closed accounts | `dropna` removed the churners; ticket effect 67% too small | ❌ |
+| one billing region in cents | "price doesn't affect churn" | ❌ |
+| one acquisition channel pricier and churnier, unlabelled | every coefficient ~100% off | ❌ |
+| ~50 bills at ±$800 (decimal slip) | price effect 90% off | ❌ |
+| charges + charges-with-tax + annual charges | price effect split three ways, sign unstable | ❌ |
+| tenure derived from a noisy invoice date | tenure effect 70% too small, mis-ranked | ❌ |
+| billing join duplicated rows | estimates fine | harmless |
+| a new `enterprise` plan with two customers | fine | harmless |
+
+<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/01-headline-and-stars.png" alt="Report headline: Round 1: The Time Traveler (target_leakage) hit stage prepare — beta_contract_one_year moved 5767% from the planted truth and nothing warned you. Star rating: prepare 3 stars, train 5 stars." width="880"></p>
+
+**Then the antibodies.** For each silent failure the explainer wrote *why* in the domain's own words, a checker at the stage boundary, and a heads-up. Same ten stones again: **six caught**; two still silent — and for those two the skill says plainly that the data as delivered cannot reveal them, and which columns to ask for.
+
+**Then the hold-out** — the part that makes it evidence. Ten perturbations the checkers were *never written for*: tenure in years, a different column going missing, a *very* noisy leak, the outcome itself missing, a stone dropped *between* stages… **Nine of ten flagged** by antibodies written for something else; the one miss is the batch the skill already declares unguardable. The first pass of that hold-out exposed two real holes in the antibodies — and fixing them is in the replay too.
+
+<p align="center">
+  <a href="examples/churn_ai_pipeline/"><b>Full write-up, the pipeline, and a 4-minute replay script →</b></a> &nbsp;·&nbsp;
+  <a href="docs/demo/churn/">the rendered report and the skill it produced →</a>
+</p>
+
+<br>
+
+## 💡 Why
+
+You ask Claude to write your pipeline. It writes clean, competent code. You run it on the real data, wait hours, and the result is wrong — because of something that was *known*: the region where every variant is correlated, the column secretly computed from the outcome, the join that doubled half the rows, the spreadsheet that exported `1,234` as text.
 
 The AI knew about all of these. It didn't apply them, because nothing reminded it at the moment it was writing that step. You didn't catch it, because the code looked right. And by the time the mistake was visible, the compute was spent.
 
-**SkillJab gives the AI the scars before you pay for them.**
+**SkillJab gives the AI the scars before you pay for them.** The name says the mechanism: a *jab* is a vaccine shot and a boxing punch — a small, deliberate hit that makes you stronger before the real fight.
 
-## What it does for you
+<br>
 
-SkillJab is a **jab** — a small controlled hit, like a vaccine shot or a sparring punch — delivered to a *miniature* of your analysis before the real run. Inside Claude Code, it makes the AI:
+## ⚙️ How it works
 
-1. **Plan the analysis several ways at once**, with different personas (a statistician, a domain veteran, the person who runs the cluster, Reviewer 2), and shows you *where the plans disagree* — that is where the risk lives.
-2. **Prove the pipeline can recover a truth you planted.** It generates a tiny dataset with a known answer and runs the whole pipeline on it. If the answer doesn't come back, the pipeline is wrong before any real data touches it.
-3. **Attack the miniature with "stones"** — missing-not-at-random values, a hidden batch, a leaked column, duplicated rows, two units in one column — and report only the **silent failures**: the result moved *and nothing warned you*.
-4. **Explain every silent failure**, which is the moment the AI says *"oh — this is the HLA region"* or *"that score column is computed from the outcome"*: the knowledge it had but wasn't using.
-5. **Keep what it learned as a skill.** Every explanation becomes a checker, a fix, and a heads-up in a `SKILL.md` that Claude loads automatically every time it touches that analysis again. Your AI gets better at *your* pipeline, permanently, with a record of why.
+```mermaid
+flowchart LR
+    A["🌱 Plant a truth<br/>miniature dataset,<br/>known answer"] --> B["✅ Prove recovery<br/>run the pipeline clean"]
+    B --> C["🪨 Throw stones<br/>leak · MNAR · batch ·<br/>units · duplicates …"]
+    C --> D{"result moved<br/>and no check fired?"}
+    D -- "silent failure" --> E["💬 Explain<br/>the AI wakes up:<br/>'oh — this is the HLA region'"]
+    E --> F["🧬 Antibody<br/>checker + fix + heads-up"]
+    F --> G["📜 SKILL.md<br/>loaded every time Claude<br/>touches this analysis"]
+    G -.-> C
+    D -- "caught / harmless" --> H["pass — say nothing"]
+    style D fill:#ff5a4e,color:#fff,stroke:none
+    style G fill:#1b2a4a,color:#fff,stroke:none
+```
 
-And it hands you a **crash-test report** so you can see, in one page, where your analysis is strong and where it is fragile.
+1. **Plan it several ways.** Planners with different personas — a statistician, a domain veteran, the person who runs the cluster, Reviewer 2 — each write a plan. Where they *disagree* is where the risk lives.
+2. **Plant a truth and prove recovery.** A tiny dataset with a known answer, the whole pipeline run on it. If the answer doesn't come back, the pipeline is wrong before any real data.
+3. **Throw stones.** Generic perturbations, dosed to bite. Only **silent failures** are reported — the result moved *and* nothing fired.
+4. **Explain.** Each silent failure forces the AI to say *why*, which is when it recalls the domain knowledge it had but wasn't using.
+5. **Keep the antibody.** Explanation → checker + mitigation + heads-up → rendered into `SKILL.md`, with provenance.
+6. **Repeat** until a round is clean. Then run the real thing — with a hook that warns you if the skill has gone stale.
 
-## A real test: the churn model Claude wrote
+Every step is a slash command:
 
-The kind of prompt people give an AI every day: *"Here's a CSV of our customers — tenure, monthly charges, support tickets, contract, plan, churned. Build a churn model and tell me which factors matter."* Claude wrote `dropna` → `get_dummies` → logistic regression on every column. Clean code. On clean data it recovers every planted effect: AUC 0.73, factors ranked correctly.
-
-Then SkillJab threw ten stones at it, one per round — each one a thing that happens to real customer tables. **Eight broke the answer and nothing warned anyone:**
-
-| what a real table does | what the AI's pipeline reported |
+| command | what it does |
 |---|---|
-| a `churn_score_v1` column from an earlier model | AUC 1.0; "nothing matters except the score" |
-| `monthly_charges` exported as text (`'1,234.50'`) | `get_dummies` made 1,400 columns; the price coefficient vanished |
-| support history purged for closed accounts | `dropna` removed the churners; ticket effect 67% too small |
-| one billing region in cents | "price doesn't affect churn" |
-| one acquisition channel pricier and churnier, unlabelled | every coefficient ~100% off |
-| ~50 bills at ±$800 (decimal slip) | price effect 90% off |
-| charges + charges-with-tax + annual charges | price effect split three ways, sign unstable |
-| tenure derived from a noisy invoice date | tenure effect 70% too small, mis-ranked |
+| `/skilljab:build` | interview → plans ×N → divergence map → lineup → miniature → clean-recovery proof → `SKILL.md` v0 |
+| `/skilljab:test` | one sabotage round; you see only the silent failures |
+| `/skilljab:improve` | turn them into antibodies; re-test until the round is clean |
+| `/skilljab:jab` | test + improve, looped — the whole vaccine in one command |
+| `/skilljab:recall` | *"describe something odd from a past run, badly"* — it lists what it could have been; what you recognize becomes an antibody |
+| `/skilljab:report` | the crash-test page |
 
-Then the explainer wrote the antibodies. Same ten stones again: **six caught**, two still silent — and for those two the skill says plainly that the data as delivered cannot reveal them and which columns to ask for. That distinction is the product: not "we catch everything," but "here is what's guarded, here is what isn't, and here is the question to ask before you trust the model."
+<br>
 
-Checkers written for a stone will of course catch that stone — so the replay ends with a **hold-out**: ten perturbations the checkers were never written for (tenure in years, a different column going missing, a *very* noisy leak, the outcome itself missing, a stone dropped *between* stages…). **Nine of ten flagged** by antibodies written for something else (six broke the result and were caught; three fired on a genuinely bad column whose damage happened to stay inside tolerance); the one miss is the batch the skill already declares unguardable. The first pass of that hold-out found two real holes — a leak threshold that was too strict, and no guard at the second stage — and fixing them is in the replay too.
+## 📊 The report
 
-Full write-up, the pipeline, and a script that replays it in three minutes: [`examples/churn_ai_pipeline/`](examples/churn_ai_pipeline/). The rendered report and the skill it produced: [`docs/demo/churn/`](docs/demo/churn/).
+One sentence at the top tells you the worst thing it found; everything below shows where and how much. A single self-contained HTML file — no server, no external requests, safe to email. These are from the churn test.
 
-## The report
+<table>
+<tr><td width="50%" valign="top">
 
-One sentence at the top tells you the worst thing it found; everything below shows where and how much. These are from the churn test above.
+<img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/02-twin-result.png" alt="Twin result: your estimates against the planted truth, with a dose slider">
 
-<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/01-headline-and-stars.png" alt="Headline: Round 1: The Time Traveler (target_leakage) hit stage prepare — beta_contract_one_year moved 5767% from the planted truth and nothing warned you. Star rating per stage: prepare 2 stars, train 5 stars." width="880"></p>
+**Slow-motion replay** — your own estimates against the planted truth, with a slider for the dose. Watch the coefficient leave the green band and see the point where nothing would have told you.
 
-**Star rating per stage** — which step of your pipeline is weak, in two seconds. A stage loses stars for every stone that broke the result without any check firing.
+</td><td width="50%" valign="top">
 
-<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/02-twin-result.png" alt="Twin result: your estimates against the planted truth, with a dose slider" width="880"></p>
+<img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/03-breaking-points.png" alt="Breaking-point curves: dose against error for seven stones, with the tolerance line">
 
-**Slow-motion replay** — your own estimates against the planted truth, with a slider for the dose. You watch the coefficient leave the green band and see the point where nothing would have told you.
+**Where it breaks** — dose against error per stone; the knee is the fragility. "How much missingness can I survive?" gets a number, not a warning. Green dots: a check caught it.
 
-<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/03-breaking-points.png" alt="Breaking-point curves: dose against error for seven stones, with the tolerance line; dots colored by whether a check caught it" width="880"></p>
+</td></tr>
+<tr><td width="50%" valign="top">
 
-**Where it breaks** — dose against error for each stone; the knee is the fragility. It answers "how much missingness can I survive?" with a number instead of a warning. After immunization the dots turn green: the checks fire at every dose that breaks the result.
+<img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/04-fragility-matrix.png" alt="Fragility matrix: stone by stage, colored by worst outcome">
 
-<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/04-fragility-matrix.png" alt="Fragility matrix: stone by stage, colored by worst outcome — red silent, green caught, grey harmless" width="880"></p>
+**Impact points** — stone × stage, colored by the worst outcome ever seen: red silent, green caught, grey harmless. The reds that remain are the ones the skill says it cannot guard without more columns.
 
-**Impact points** — stone × stage, colored by the worst outcome ever seen: red is silent, green is caught, grey is harmless. The two reds that remain are the ones the skill says it cannot guard without more columns.
+</td><td width="50%" valign="top">
 
-<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/05-lap-times.png" alt="Lap times: predicted runtime per stage at N = 2,000,000 with ranges and a checkpoint suggestion" width="880"></p>
+<img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/05-lap-times.png" alt="Lap times: predicted runtime per stage at N = 2,000,000">
 
-**Lap times** — predicted runtime per stage at your *real* N (here 2,000,000 customers), extrapolated from three miniature sizes, with the range, a flag for anything superlinear, and where to put a cheap check so a bad input dies at minute two instead of hour six.
+**Lap times** — predicted runtime per stage at your *real* N, extrapolated from three miniature sizes, with ranges, a flag for anything superlinear, and where to put a cheap check so a bad input dies at minute two instead of hour six.
 
-<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/06-immunity-record.png" alt="Vaccination card: rounds by stones, red turning green as antibodies were added, plus the list of antibodies and the judge's calibration" width="880"></p>
+</td></tr>
+</table>
+
+<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/churn/06-immunity-record.png" alt="Vaccination card: rounds by stones, red turning green as antibodies were added" width="880"></p>
 
 **Immunity record** — rounds × stones; red turning green is the skill learning. Below it, every antibody with its provenance, and how often the judge picked the right plan in the lineup.
 
-The report is a single self-contained HTML file. No server, no external requests, safe to email.
+<br>
 
-## What you get, in your repo
-
-```
-.claude/skills/<your-pipeline>/
-├── SKILL.md            what Claude reads before touching this analysis: heads-ups, fixes, checks
-├── antibodies.json     every entry traces to a round, a stone, or something you recognized
-├── tree.json           the decisions the planners disagreed on, with the evidence on each branch
-├── checks/             the checkers that now run at every stage boundary
-└── history/            rounds, sweeps, timing, the report
-```
-
-The skill says *why*. A heads-up reads like: *"stage `clean` · proven by simulation, round 1, stone `target_leakage`, worst error 90% — Selecting every x\* column swallows any column derived from the outcome. Whitelist predictors explicitly; assert no predictor has |corr| > 0.9 with y before fitting. Check: `checks/no_leaky_columns.py`."* Three evidence classes, kept apart: **proven by simulation**, **reported by you**, **hypothesis only**.
-
-## Quick start
+## 🚀 Install
 
 ```bash
-pipx install skilljab                                  # the engine (Debian/Ubuntu: sudo apt install pipx first)
+pipx install skilljab                                  # the engine — a CLI, so pipx (no fight with system Python)
 git clone https://github.com/AlsammanAlsamman/skilljab
 claude --plugin-dir ./skilljab/plugin                  # the Claude Code side
 ```
 
-Then, in Claude Code, on any analysis:
-
-```
-/skilljab:build   pipeline.yaml        plans ×N, divergence map, lineup, miniature, clean-recovery proof, SKILL.md v0
-/skilljab:test                         one sabotage round; you see only the silent failures
-/skilljab:improve                      turn them into antibodies; re-test until the round is clean
-/skilljab:jab                          test + improve looped — the whole vaccine in one command
-/skilljab:recall                       "describe something odd from a past run, badly" — it lists what it could have been
-/skilljab:report                       the crash-test page
-```
-
-Try it on the shipped examples first — `examples/churn_ai_pipeline/` (the real test above, `./run_demo.sh`) or the minimal `examples/toy_regression/`:
+<details>
+<summary>No pipx? Other ways to install</summary>
 
 ```bash
-cd skilljab/examples/toy_regression
-skilljab init     --name toy --pipeline pipeline.yaml --spec spec.yaml --skill-dir .claude/skills/toy
-skilljab baseline --skill .claude/skills/toy --target-n 200000
-skilljab round new    --skill .claude/skills/toy
-skilljab round stones --skill .claude/skills/toy target_leakage --level 0.6
-skilljab round run    --skill .claude/skills/toy          # → "silent": beta_x1 off by 90%, no check fired
-skilljab report --skill .claude/skills/toy                # → history/report.html
+sudo apt install pipx && pipx ensurepath        # Debian / Ubuntu
+brew install pipx                               # macOS
+python3 -m venv ~/.skilljab && ~/.skilljab/bin/pip install skilljab && export PATH=~/.skilljab/bin:$PATH   # plain venv
+pipx install git+https://github.com/AlsammanAlsamman/skilljab.git   # bleeding edge
 ```
 
-## How it stays honest
+Requires Python ≥ 3.10. GNU `time` (`/usr/bin/time`) is used for per-stage peak memory when present.
+</details>
+
+### Quick start — in Claude Code
+
+```
+/skilljab:build  pipeline.yaml
+/skilljab:jab
+/skilljab:report
+```
+
+### Quick start — CLI only
+
+<details>
+<summary>Replay the churn test (4 minutes)</summary>
+
+```bash
+cd skilljab/examples/churn_ai_pipeline
+./run_demo.sh                                         # baseline, 30 rounds, 7 sweeps, report
+open .claude/skills/churn/history/report.html
+cat  .claude/skills/churn/SKILL.md
+```
+</details>
+
+<details>
+<summary>Drive the engine by hand on your own pipeline</summary>
+
+```bash
+skilljab init     --name mine --pipeline pipeline.yaml --spec spec.yaml --skill-dir .claude/skills/mine
+skilljab baseline --skill .claude/skills/mine --target-n 2000000     # proves clean recovery, fits timing
+skilljab round new    --skill .claude/skills/mine
+skilljab round stones --skill .claude/skills/mine target_leakage mnar_missing --level 0.6
+skilljab round run    --skill .claude/skills/mine                     # -> silent | caught | harmless | …
+skilljab sweep  --skill .claude/skills/mine --stone mnar_missing --levels 6
+skilljab antibody add --skill .claude/skills/mine --file antibody.json
+skilljab report --skill .claude/skills/mine                           # history/report.html
+skilljab status --skill .claude/skills/mine                           # jabbed: true/false, and why
+```
+</details>
+
+<br>
+
+## 📦 What you get
+
+In *your* repo, per pipeline:
+
+```
+.claude/skills/<your-pipeline>/
+├── SKILL.md            what Claude reads before touching this analysis — rendered, never hand-edited
+├── antibodies.json     every entry traces to a round, a stone, or something you recognized
+├── tree.json           the decisions the planners disagreed on, with the evidence on each branch
+├── checks/             the checkers that now run at every stage boundary
+└── history/            rounds · sweeps · timing · lineup log · graveyard · the report
+```
+
+A heads-up in the skill reads like this:
+
+> **ab-004 · dropna removed the churners** — stage `prepare` · decision `missing_handling` · *round 3, stone `mnar_missing`, worst error 67%*
+> - **Trigger:** missingness of any column differs by > 5 points between churned and not
+> - **Heads-up:** `support_tickets` was blank for the customers with the most tickets — their ticket history is purged when an account closes. `dropna` removed a biased slice of churners, and the effect of support tickets came out 67% too small.
+> - **Do:** report missingness per column split by outcome before dropping anything; use a missing indicator or imputation.
+> - **Check:** `checks/missingness_by_outcome.py` runs after stage `prepare`
+
+Three evidence classes, kept apart: **proven by simulation** · **reported by you** · **hypothesis only**.
+
+<br>
+
+## 🔬 Under the hood
 
 Two halves, and each fact lives in exactly one:
 
-| | **Engine** — `skilljab` CLI (Python, no AI inside) | **Plugin** — Claude Code |
+| | **Engine** — `skilljab` CLI · Python · no AI inside | **Plugin** — Claude Code |
 |---|---|---|
 | does | plant the truth, inject stones, run stages, grade, sweep doses, diff plans, predict time, render the skill and the report | interview, plan ×N, judge, sabotage, analyze, explain, write antibodies |
-| never | decide what a failure *means* | compute a verdict or grade itself |
+| never | decide what a failure *means* | compute a verdict, or grade itself |
 
-Five subagents that cannot see each other's files: **planners** (one per persona), a **judge** that runs a lineup — "one of these plans failed; which?" — and is scored against planted culprits so you know how much to trust it, a **saboteur** that picks stones, a blind **analyst** that runs the pipeline with the current skill loaded, and an **explainer**, the only one allowed to see what was planted.
+**Five blind roles.** Subagents that cannot see each other's files: **planners** (one per persona) · a **judge** that runs the lineup — *"one of these plans failed; which?"* — and is scored against planted culprits so you know how much to trust it · a **saboteur** that picks stones · a blind **analyst** that runs the pipeline with the current skill loaded · an **explainer**, the only one allowed to see what was planted.
 
-*Elicitation proposes; simulation disposes.* The AI can suspect anything; only a stone that actually breaks the miniature — or something you recognized yourself — earns a place in the skill.
+**The funnel.** Search wide and cheap, prove narrow and expensive:
 
-## The stones
+| step | technique | what it gives |
+|---|---|---|
+| 0 | **divergence map** — diff N plans | where the plans disagree = where uncertainty lives |
+| 1 | **déjà vu** — `skilljab graveyard search` | setups of similar past failures; predict the outcome, *then* reveal |
+| 2 | **blurry-friend probe** — describe a symptom badly | the model enumerates the neighbourhood; you *recognize* what you couldn't recall |
+| 3 | **stones** — build, dose, run | only silent failures survive |
 
-Deliberately domain-neutral. A generic stone is enough to make the AI's own knowledge do the specialization.
+*Elicitation proposes; simulation disposes.* The AI can suspect anything; only a stone that breaks the miniature — or something you recognized yourself — earns a place in the skill.
+
+<br>
+
+## 🪨 The stones
+
+Deliberately domain-neutral. A generic stone is enough to make the AI's own knowledge do the specialization: *"a correlated block broke PCA"* becomes *"exclude chr6:25–35 Mb before PCA"* in the explainer's hands.
 
 | character | stone | what it does to the miniature |
 |---|---|---|
-| The Time Traveler | `target_leakage` | adds a feature computed from the outcome |
-| The Ghost | `mnar_missing` | blanks the top values — missing-not-at-random |
-| The Clique | `correlated_block` | near-identical copies of a feature |
-| The Drifter | `batch_shift` | a hidden batch confounded with the outcome |
-| The Twin | `duplicates` | re-appends rows |
-| The Spike | `outliers` | a few impossible values |
-| The Blur | `measurement_error` | noise in a predictor (attenuation) |
-| The Metric Martian | `unit_mix` | two units in one column |
-| The Long Tail | `heavy_tails` | Student-t noise |
-| The Unicorn | `rare_category` | a category level with almost no support |
-| The Typo | `type_corruption` | `'1,234'`, `' 12 '`, `'NA'` in a numeric column |
+| 🕰️ The Time Traveler | `target_leakage` | adds a feature computed from the outcome |
+| 👻 The Ghost | `mnar_missing` | blanks the top values — missing-not-at-random |
+| 👥 The Clique | `correlated_block` | near-identical copies of a feature |
+| 🌊 The Drifter | `batch_shift` | a hidden batch confounded with the outcome |
+| 👯 The Twin | `duplicates` | re-appends rows |
+| 📈 The Spike | `outliers` | a few impossible values |
+| 🌫️ The Blur | `measurement_error` | noise in a predictor (attenuation) |
+| 👽 The Metric Martian | `unit_mix` | two units in one column |
+| 🦎 The Long Tail | `heavy_tails` | Student-t noise |
+| 🦄 The Unicorn | `rare_category` | a category level with almost no support |
+| ⌨️ The Typo | `type_corruption` | `'1,234'`, `' 12 '`, `'NA'` in a numeric column |
 
-## Your pipeline's contract
+<br>
+
+## 🔌 Your pipeline's contract
 
 Stages as shell commands — any language, any tool — and a last stage that writes the estimates:
 
@@ -172,16 +303,32 @@ stages:
   - id: fit     cmd: "python fit.py {in} {out}"                                 out: result.json
 ```
 
-`result.json = {"estimates": {"beta_x1": 0.79, ...}}`, with the same names as the planted truth in `sim/spec.yaml`. Checkers are scripts called at stage boundaries — `python3 check.py <stage_output>` — that exit `1` or print `{"fired": true, "message": "..."}`.
+`result.json = {"estimates": {"beta_x1": 0.79, ...}}`, with the same names as the planted truth in `sim/spec.yaml`. Checkers are scripts called at stage boundaries — `python3 check.py <stage_output> <stage_input>` — that exit `1` or print `{"fired": true, "message": "..."}`.
 
-## Honest limits
+Three generators ship: `tabular_regression`, `tabular_classification`, `two_group_lift` — with named features, categorical effects, and a planted intercept. Adding one is a function that returns `(DataFrame, {estimand: truth})`.
+
+<br>
+
+## ⚠️ Limits
 
 - **Miniatures can lie.** Some failures only appear at scale. The timing page extrapolates and says so; treat ranges as optimistic.
-- **You need a truth to plant.** Quantitative analyses, yes; design and strategy, no — there the simulation is just the AI's own assumptions fed back to itself.
-- **Three generators ship** (`tabular_regression`, `tabular_classification`, `two_group_lift`). A genotype generator with real LD structure and a counts generator are the next ones.
+- **You need a truth to plant.** Quantitative analyses, yes. Design and strategy, no — there the simulation would just be the AI's own assumptions fed back to itself.
+- **Stones are stones.** The churn test proves the mechanism and its generalization; it has not yet caught a problem in a real dataset that nobody planted. That's the next test, and the one that matters most.
 - **The graveyard is local.** A shared, anonymized graveyard of real past failures is the obvious next step.
 
-## Development
+<details>
+<summary>Roadmap</summary>
+
+- A genotype generator with real LD structure (the HLA region as a stone), and a counts generator for RNA-seq
+- Adapters that read estimands out of common outputs (regression summaries, GWAS sumstats, DE tables) instead of a hand-written `result.json`
+- The twin view on the user's *real* final figure, not a proxy
+- A shared graveyard
+- Snakemake / Nextflow / Makefile pipeline adapters
+</details>
+
+<br>
+
+## 🛠️ Development
 
 ```bash
 git clone https://github.com/AlsammanAlsamman/skilljab && cd skilljab
@@ -190,10 +337,18 @@ python -m pytest -q                              # 47 tests, ~35 s
 claude plugin validate plugin --strict
 ```
 
-Design notes and the reasoning behind every choice — the pre-mortem, the recoverability test, why generic stones beat a hand-written pitfall library, the lineup, the tricks for making an AI say "oh yeah, I should have told you" — are in [`docs/DESIGN.md`](docs/DESIGN.md).
+```
+skilljab/            engine: simulate · stones/ · inject · runner · check · project · plandiff · tree · lineup · timing · render_skill · graveyard · report · pack/
+plugin/              Claude Code plugin: commands/ · agents/ · skills/skilljab-core · hooks/
+examples/            churn_ai_pipeline — the test above, replayable · toy_regression — the minimal example the tests use
+docs/DESIGN.md       the design and the reasoning behind every choice
+docs/sessions/       transcripts of the design discussions
+```
 
-## Author
+The thinking — the pre-mortem, the recoverability test, why generic stones beat a hand-written pitfall library, the lineup, the tricks for making an AI say *"oh yeah, I should have told you"* — is in [`docs/DESIGN.md`](docs/DESIGN.md).
 
-**Alsamman M. Alsamman** — aalsamman100@gmail.com · [github.com/AlsammanAlsamman](https://github.com/AlsammanAlsamman) · MIT
+<br>
 
-*A jab is a vaccine shot and a boxing punch. Both are a small, deliberate hit that makes you stronger before the real fight.*
+<p align="center">
+  <b>Alsamman M. Alsamman</b> · aalsamman100@gmail.com · <a href="https://github.com/AlsammanAlsamman">github.com/AlsammanAlsamman</a> · MIT
+</p>
