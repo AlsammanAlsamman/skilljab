@@ -1,0 +1,1269 @@
+{
+  "name": "toy_regression",
+  "version": 1,
+  "generated": "2026-09-13T05:44:08",
+  "headline": "Round 2: The Spike (outliers) hit stage clean \u2014 `beta_x1` moved 32% from the planted truth and nothing warned you.",
+  "stage_ids": [
+    "clean",
+    "fit"
+  ],
+  "stages": {
+    "clean": {
+      "n_stones": 4,
+      "silent": 3,
+      "crashed": 0,
+      "caught": 1,
+      "harmless": 0,
+      "worst_rel_err": 1.309,
+      "stars": 1,
+      "baseline_seconds": 0.289
+    },
+    "fit": {
+      "n_stones": 2,
+      "silent": 2,
+      "crashed": 0,
+      "caught": 0,
+      "harmless": 0,
+      "worst_rel_err": 0.755,
+      "stars": 1,
+      "baseline_seconds": 0.3234
+    }
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "stone": "target_leakage",
+      "character": "The Time Traveler",
+      "dose": {
+        "noise_sd": 0.32
+      },
+      "stage": "clean",
+      "class": "silent",
+      "worst_rel_err": 0.902898,
+      "checks_fired": [],
+      "time_impact": {
+        "clean": 0.984,
+        "fit": 0.91
+      },
+      "estimands": {
+        "beta_x1": {
+          "truth": 0.8,
+          "estimate": 0.07768165427019624,
+          "abs_err": 0.722318,
+          "rel_err": 0.902898,
+          "degraded": true
+        },
+        "beta_x2": {
+          "truth": -0.5,
+          "estimate": -0.052656159798695715,
+          "abs_err": 0.447344,
+          "rel_err": 0.894688,
+          "degraded": true
+        },
+        "beta_x3": {
+          "truth": 0.0,
+          "estimate": 0.008441672902905067,
+          "abs_err": 0.008442,
+          "rel_err": 0.008442,
+          "degraded": false
+        }
+      }
+    },
+    {
+      "round": 2,
+      "stone": "outliers",
+      "character": "The Spike",
+      "dose": {
+        "frac": 0.0365,
+        "scale": 22
+      },
+      "stage": "clean",
+      "class": "silent",
+      "worst_rel_err": 1.30888,
+      "checks_fired": [],
+      "time_impact": {
+        "clean": 1.016,
+        "fit": 0.944
+      },
+      "estimands": {
+        "beta_x1": {
+          "truth": 0.8,
+          "estimate": 1.0552755340065696,
+          "abs_err": 0.255276,
+          "rel_err": 0.319094,
+          "degraded": true
+        },
+        "beta_x2": {
+          "truth": -0.5,
+          "estimate": -1.154440027818321,
+          "abs_err": 0.65444,
+          "rel_err": 1.30888,
+          "degraded": true
+        },
+        "beta_x3": {
+          "truth": 0.0,
+          "estimate": 0.36514183675131273,
+          "abs_err": 0.365142,
+          "rel_err": 0.365142,
+          "degraded": true
+        }
+      }
+    },
+    {
+      "round": 2,
+      "stone": "duplicates",
+      "character": "The Twin",
+      "dose": {
+        "frac": 0.295
+      },
+      "stage": "clean",
+      "class": "silent",
+      "worst_rel_err": 1.30888,
+      "checks_fired": [],
+      "time_impact": {
+        "clean": 1.016,
+        "fit": 0.944
+      },
+      "estimands": {
+        "beta_x1": {
+          "truth": 0.8,
+          "estimate": 1.0552755340065696,
+          "abs_err": 0.255276,
+          "rel_err": 0.319094,
+          "degraded": true
+        },
+        "beta_x2": {
+          "truth": -0.5,
+          "estimate": -1.154440027818321,
+          "abs_err": 0.65444,
+          "rel_err": 1.30888,
+          "degraded": true
+        },
+        "beta_x3": {
+          "truth": 0.0,
+          "estimate": 0.36514183675131273,
+          "abs_err": 0.365142,
+          "rel_err": 0.365142,
+          "degraded": true
+        }
+      }
+    },
+    {
+      "round": 3,
+      "stone": "target_leakage",
+      "character": "The Time Traveler",
+      "dose": {
+        "noise_sd": 0.32
+      },
+      "stage": "clean",
+      "class": "caught",
+      "worst_rel_err": 0.832696,
+      "checks_fired": [
+        "checks/no_leaky_columns.py"
+      ],
+      "time_impact": {
+        "clean": 1.023,
+        "fit": 0.906
+      },
+      "estimands": {
+        "beta_x1": {
+          "truth": 0.8,
+          "estimate": 0.1338428144414212,
+          "abs_err": 0.666157,
+          "rel_err": 0.832696,
+          "degraded": true
+        },
+        "beta_x2": {
+          "truth": -0.5,
+          "estimate": -0.1095479632750693,
+          "abs_err": 0.390452,
+          "rel_err": 0.780904,
+          "degraded": true
+        },
+        "beta_x3": {
+          "truth": 0.0,
+          "estimate": 0.012331714124860733,
+          "abs_err": 0.012332,
+          "rel_err": 0.012332,
+          "degraded": false
+        }
+      }
+    },
+    {
+      "round": 4,
+      "stone": "mnar_missing",
+      "character": "The Ghost",
+      "dose": {
+        "frac": 0.275
+      },
+      "stage": "fit",
+      "class": "silent",
+      "worst_rel_err": 0.754536,
+      "checks_fired": [],
+      "time_impact": {
+        "clean": 1.163,
+        "fit": 0.799
+      },
+      "estimands": {
+        "beta_x1": {
+          "truth": 0.8,
+          "estimate": 0.7452653490439969,
+          "abs_err": 0.054735,
+          "rel_err": 0.068418,
+          "degraded": false
+        },
+        "beta_x2": {
+          "truth": -0.5,
+          "estimate": -0.2858429010044511,
+          "abs_err": 0.214157,
+          "rel_err": 0.428314,
+          "degraded": true
+        },
+        "beta_x3": {
+          "truth": 0.0,
+          "estimate": 0.7545359127786482,
+          "abs_err": 0.754536,
+          "rel_err": 0.754536,
+          "degraded": true
+        }
+      }
+    },
+    {
+      "round": 4,
+      "stone": "batch_shift",
+      "character": "The Drifter",
+      "dose": {
+        "frac": 0.47000000000000003,
+        "shift": 3.7
+      },
+      "stage": "fit",
+      "class": "silent",
+      "worst_rel_err": 0.754536,
+      "checks_fired": [],
+      "time_impact": {
+        "clean": 1.163,
+        "fit": 0.799
+      },
+      "estimands": {
+        "beta_x1": {
+          "truth": 0.8,
+          "estimate": 0.7452653490439969,
+          "abs_err": 0.054735,
+          "rel_err": 0.068418,
+          "degraded": false
+        },
+        "beta_x2": {
+          "truth": -0.5,
+          "estimate": -0.2858429010044511,
+          "abs_err": 0.214157,
+          "rel_err": 0.428314,
+          "degraded": true
+        },
+        "beta_x3": {
+          "truth": 0.0,
+          "estimate": 0.7545359127786482,
+          "abs_err": 0.754536,
+          "rel_err": 0.754536,
+          "degraded": true
+        }
+      }
+    }
+  ],
+  "sweeps": [
+    {
+      "stone": "measurement_error",
+      "character": "The Blur",
+      "after_stage": null,
+      "levels": [
+        {
+          "level": 0.0,
+          "dose": {
+            "sd": 0.3,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.126651,
+          "class": "harmless",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.7238677536699144,
+              "rel_err": 0.095165
+            },
+            "beta_x2": {
+              "estimate": -0.5633252617903077,
+              "rel_err": 0.126651
+            },
+            "beta_x3": {
+              "estimate": 0.012702273828643335,
+              "rel_err": 0.012702
+            }
+          },
+          "time_impact": {
+            "clean": 0.958,
+            "fit": 0.761
+          }
+        },
+        {
+          "level": 0.2,
+          "dose": {
+            "sd": 0.54,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.186496,
+          "class": "harmless",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.6508031312706948,
+              "rel_err": 0.186496
+            },
+            "beta_x2": {
+              "estimate": -0.5299721562217081,
+              "rel_err": 0.059944
+            },
+            "beta_x3": {
+              "estimate": 0.018912866434883588,
+              "rel_err": 0.018913
+            }
+          },
+          "time_impact": {
+            "clean": 0.976,
+            "fit": 0.867
+          }
+        },
+        {
+          "level": 0.4,
+          "dose": {
+            "sd": 0.78,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.385932,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.4912547965484342,
+              "rel_err": 0.385932
+            },
+            "beta_x2": {
+              "estimate": -0.5777143695304,
+              "rel_err": 0.155429
+            },
+            "beta_x3": {
+              "estimate": -0.004271271684345358,
+              "rel_err": 0.004271
+            }
+          },
+          "time_impact": {
+            "clean": 0.973,
+            "fit": 0.722
+          }
+        },
+        {
+          "level": 0.6,
+          "dose": {
+            "sd": 1.02,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.477151,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.4182793076027549,
+              "rel_err": 0.477151
+            },
+            "beta_x2": {
+              "estimate": -0.5447235328695591,
+              "rel_err": 0.089447
+            },
+            "beta_x3": {
+              "estimate": -0.022823716421599305,
+              "rel_err": 0.022824
+            }
+          },
+          "time_impact": {
+            "clean": 0.862,
+            "fit": 0.857
+          }
+        },
+        {
+          "level": 0.8,
+          "dose": {
+            "sd": 1.26,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.612688,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.3098492673907728,
+              "rel_err": 0.612688
+            },
+            "beta_x2": {
+              "estimate": -0.5705478833855457,
+              "rel_err": 0.141096
+            },
+            "beta_x3": {
+              "estimate": 0.012931072264895593,
+              "rel_err": 0.012931
+            }
+          },
+          "time_impact": {
+            "clean": 0.932,
+            "fit": 0.76
+          }
+        },
+        {
+          "level": 1.0,
+          "dose": {
+            "sd": 1.5,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.720949,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.22324047728159602,
+              "rel_err": 0.720949
+            },
+            "beta_x2": {
+              "estimate": -0.5466304273450634,
+              "rel_err": 0.093261
+            },
+            "beta_x3": {
+              "estimate": 0.014189364720446535,
+              "rel_err": 0.014189
+            }
+          },
+          "time_impact": {
+            "clean": 0.884,
+            "fit": 0.883
+          }
+        }
+      ],
+      "knee_level": 0.4,
+      "knee_dose": {
+        "sd": 0.78,
+        "col": "x1"
+      }
+    },
+    {
+      "stone": "mnar_missing",
+      "character": "The Ghost",
+      "after_stage": null,
+      "levels": [
+        {
+          "level": 0.0,
+          "dose": {
+            "frac": 0.05,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.081958,
+          "class": "harmless",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.7344339854170648,
+              "rel_err": 0.081958
+            },
+            "beta_x2": {
+              "estimate": -0.5148928593487249,
+              "rel_err": 0.029786
+            },
+            "beta_x3": {
+              "estimate": 0.027860738606337365,
+              "rel_err": 0.027861
+            }
+          },
+          "time_impact": {
+            "clean": 0.933,
+            "fit": 0.815
+          }
+        },
+        {
+          "level": 0.2,
+          "dose": {
+            "frac": 0.1,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.135337,
+          "class": "harmless",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.6917303773472901,
+              "rel_err": 0.135337
+            },
+            "beta_x2": {
+              "estimate": -0.49024490244736174,
+              "rel_err": 0.01951
+            },
+            "beta_x3": {
+              "estimate": 0.02069330044976897,
+              "rel_err": 0.020693
+            }
+          },
+          "time_impact": {
+            "clean": 0.783,
+            "fit": 0.847
+          }
+        },
+        {
+          "level": 0.4,
+          "dose": {
+            "frac": 0.15000000000000002,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.18193,
+          "class": "harmless",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.6544559107747113,
+              "rel_err": 0.18193
+            },
+            "beta_x2": {
+              "estimate": -0.46006031590030416,
+              "rel_err": 0.079879
+            },
+            "beta_x3": {
+              "estimate": 0.024341928694757986,
+              "rel_err": 0.024342
+            }
+          },
+          "time_impact": {
+            "clean": 0.807,
+            "fit": 0.887
+          }
+        },
+        {
+          "level": 0.6,
+          "dose": {
+            "frac": 0.2,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.21889,
+          "class": "harmless",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.6248881375200707,
+              "rel_err": 0.21889
+            },
+            "beta_x2": {
+              "estimate": -0.4320896521143851,
+              "rel_err": 0.135821
+            },
+            "beta_x3": {
+              "estimate": 0.02323820462062382,
+              "rel_err": 0.023238
+            }
+          },
+          "time_impact": {
+            "clean": 0.879,
+            "fit": 0.685
+          }
+        },
+        {
+          "level": 0.8,
+          "dose": {
+            "frac": 0.25,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.245828,
+          "class": "harmless",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.6033376864689746,
+              "rel_err": 0.245828
+            },
+            "beta_x2": {
+              "estimate": -0.3986312425906259,
+              "rel_err": 0.202738
+            },
+            "beta_x3": {
+              "estimate": 0.023804699270424834,
+              "rel_err": 0.023805
+            }
+          },
+          "time_impact": {
+            "clean": 0.934,
+            "fit": 0.836
+          }
+        },
+        {
+          "level": 1.0,
+          "dose": {
+            "frac": 0.3,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.295305,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.5637561930726325,
+              "rel_err": 0.295305
+            },
+            "beta_x2": {
+              "estimate": -0.37991477836918,
+              "rel_err": 0.24017
+            },
+            "beta_x3": {
+              "estimate": 0.045342240703811765,
+              "rel_err": 0.045342
+            }
+          },
+          "time_impact": {
+            "clean": 0.822,
+            "fit": 0.732
+          }
+        }
+      ],
+      "knee_level": 1.0,
+      "knee_dose": {
+        "frac": 0.3,
+        "col": "x1"
+      }
+    },
+    {
+      "stone": "outliers",
+      "character": "The Spike",
+      "after_stage": null,
+      "levels": [
+        {
+          "level": 0.0,
+          "dose": {
+            "frac": 0.005,
+            "scale": 5,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.112721,
+          "class": "harmless",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.7643166164961113,
+              "rel_err": 0.044604
+            },
+            "beta_x2": {
+              "estimate": -0.556360671432752,
+              "rel_err": 0.112721
+            },
+            "beta_x3": {
+              "estimate": 0.012374931215566598,
+              "rel_err": 0.012375
+            }
+          },
+          "time_impact": {
+            "clean": 1.175,
+            "fit": 1.028
+          }
+        },
+        {
+          "level": 0.2,
+          "dose": {
+            "frac": 0.014000000000000002,
+            "scale": 10,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.158768,
+          "class": "harmless",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.8226146867977511,
+              "rel_err": 0.028268
+            },
+            "beta_x2": {
+              "estimate": -0.5793839294584773,
+              "rel_err": 0.158768
+            },
+            "beta_x3": {
+              "estimate": 0.022337510824186585,
+              "rel_err": 0.022338
+            }
+          },
+          "time_impact": {
+            "clean": 1.161,
+            "fit": 0.947
+          }
+        },
+        {
+          "level": 0.4,
+          "dose": {
+            "frac": 0.023000000000000003,
+            "scale": 15,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.291651,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 1.033320889121362,
+              "rel_err": 0.291651
+            },
+            "beta_x2": {
+              "estimate": -0.6114871149733063,
+              "rel_err": 0.222974
+            },
+            "beta_x3": {
+              "estimate": 0.1356612350944057,
+              "rel_err": 0.135661
+            }
+          },
+          "time_impact": {
+            "clean": 0.99,
+            "fit": 1.001
+          }
+        },
+        {
+          "level": 0.6,
+          "dose": {
+            "frac": 0.03200000000000001,
+            "scale": 20,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.543787,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.5936899355660978,
+              "rel_err": 0.257888
+            },
+            "beta_x2": {
+              "estimate": -0.7718936883148996,
+              "rel_err": 0.543787
+            },
+            "beta_x3": {
+              "estimate": -0.5021019750094277,
+              "rel_err": 0.502102
+            }
+          },
+          "time_impact": {
+            "clean": 1.024,
+            "fit": 1.018
+          }
+        },
+        {
+          "level": 0.8,
+          "dose": {
+            "frac": 0.041,
+            "scale": 25,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.469318,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 1.1754545171408008,
+              "rel_err": 0.469318
+            },
+            "beta_x2": {
+              "estimate": -0.4295094371543391,
+              "rel_err": 0.140981
+            },
+            "beta_x3": {
+              "estimate": -0.023246709068090288,
+              "rel_err": 0.023247
+            }
+          },
+          "time_impact": {
+            "clean": 1.149,
+            "fit": 0.99
+          }
+        },
+        {
+          "level": 1.0,
+          "dose": {
+            "frac": 0.05,
+            "scale": 30,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.927234,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.512434865579993,
+              "rel_err": 0.359456
+            },
+            "beta_x2": {
+              "estimate": -0.036382793782398115,
+              "rel_err": 0.927234
+            },
+            "beta_x3": {
+              "estimate": -0.19737623394345827,
+              "rel_err": 0.197376
+            }
+          },
+          "time_impact": {
+            "clean": 1.213,
+            "fit": 0.875
+          }
+        }
+      ],
+      "knee_level": 0.4,
+      "knee_dose": {
+        "frac": 0.023000000000000003,
+        "scale": 15,
+        "col": "x1"
+      }
+    },
+    {
+      "stone": "target_leakage",
+      "character": "The Time Traveler",
+      "after_stage": null,
+      "levels": [
+        {
+          "level": 0.0,
+          "dose": {
+            "noise_sd": 0.05,
+            "col": "x1"
+          },
+          "worst_rel_err": 1.001299,
+          "class": "caught",
+          "estimands": {
+            "beta_x1": {
+              "estimate": -0.001039163147264044,
+              "rel_err": 1.001299
+            },
+            "beta_x2": {
+              "estimate": -0.0007330694124123571,
+              "rel_err": 0.998534
+            },
+            "beta_x3": {
+              "estimate": -0.0010242272095437183,
+              "rel_err": 0.001024
+            }
+          },
+          "time_impact": {
+            "clean": 0.944,
+            "fit": 0.757
+          }
+        },
+        {
+          "level": 0.2,
+          "dose": {
+            "noise_sd": 0.14,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.98497,
+          "class": "caught",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.04655576258997618,
+              "rel_err": 0.941805
+            },
+            "beta_x2": {
+              "estimate": -0.007515160289090439,
+              "rel_err": 0.98497
+            },
+            "beta_x3": {
+              "estimate": 0.0026561381528068598,
+              "rel_err": 0.002656
+            }
+          },
+          "time_impact": {
+            "clean": 0.918,
+            "fit": 0.973
+          }
+        },
+        {
+          "level": 0.4,
+          "dose": {
+            "noise_sd": 0.23000000000000004,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.885098,
+          "class": "caught",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.09192135566315685,
+              "rel_err": 0.885098
+            },
+            "beta_x2": {
+              "estimate": -0.0787239023669221,
+              "rel_err": 0.842552
+            },
+            "beta_x3": {
+              "estimate": -0.012250330922694213,
+              "rel_err": 0.01225
+            }
+          },
+          "time_impact": {
+            "clean": 0.876,
+            "fit": 1.028
+          }
+        },
+        {
+          "level": 0.6,
+          "dose": {
+            "noise_sd": 0.32000000000000006,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.834924,
+          "class": "caught",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.1332806381816023,
+              "rel_err": 0.833399
+            },
+            "beta_x2": {
+              "estimate": -0.08253820039750318,
+              "rel_err": 0.834924
+            },
+            "beta_x3": {
+              "estimate": -0.030033514894843207,
+              "rel_err": 0.030034
+            }
+          },
+          "time_impact": {
+            "clean": 1.199,
+            "fit": 0.721
+          }
+        },
+        {
+          "level": 0.8,
+          "dose": {
+            "noise_sd": 0.41000000000000003,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.762432,
+          "class": "caught",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.19005446221003386,
+              "rel_err": 0.762432
+            },
+            "beta_x2": {
+              "estimate": -0.16230178968188075,
+              "rel_err": 0.675396
+            },
+            "beta_x3": {
+              "estimate": 0.003670887106656886,
+              "rel_err": 0.003671
+            }
+          },
+          "time_impact": {
+            "clean": 0.821,
+            "fit": 0.948
+          }
+        },
+        {
+          "level": 1.0,
+          "dose": {
+            "noise_sd": 0.5,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.728919,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.21686471305427696,
+              "rel_err": 0.728919
+            },
+            "beta_x2": {
+              "estimate": -0.17399778127070079,
+              "rel_err": 0.652004
+            },
+            "beta_x3": {
+              "estimate": 0.007093576408328403,
+              "rel_err": 0.007094
+            }
+          },
+          "time_impact": {
+            "clean": 1.06,
+            "fit": 1.051
+          }
+        }
+      ],
+      "knee_level": 1.0,
+      "knee_dose": {
+        "noise_sd": 0.5,
+        "col": "x1"
+      }
+    },
+    {
+      "stone": "unit_mix",
+      "character": "The Metric Martian",
+      "after_stage": null,
+      "levels": [
+        {
+          "level": 0.0,
+          "dose": {
+            "frac": 0.05,
+            "factor": 10,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.786556,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.17075524453183713,
+              "rel_err": 0.786556
+            },
+            "beta_x2": {
+              "estimate": -0.5267281553476588,
+              "rel_err": 0.053456
+            },
+            "beta_x3": {
+              "estimate": 0.02575524849110666,
+              "rel_err": 0.025755
+            }
+          },
+          "time_impact": {
+            "clean": 1.231,
+            "fit": 1.012
+          }
+        },
+        {
+          "level": 0.2,
+          "dose": {
+            "frac": 0.1,
+            "factor": 208,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.994914,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.0040685667081998,
+              "rel_err": 0.994914
+            },
+            "beta_x2": {
+              "estimate": -0.550172552339564,
+              "rel_err": 0.100345
+            },
+            "beta_x3": {
+              "estimate": 0.01931804091872027,
+              "rel_err": 0.019318
+            }
+          },
+          "time_impact": {
+            "clean": 1.163,
+            "fit": 0.995
+          }
+        },
+        {
+          "level": 0.4,
+          "dose": {
+            "frac": 0.15000000000000002,
+            "factor": 406,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.997187,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.0022505059693664273,
+              "rel_err": 0.997187
+            },
+            "beta_x2": {
+              "estimate": -0.5579961853575941,
+              "rel_err": 0.115992
+            },
+            "beta_x3": {
+              "estimate": -0.0219674851498539,
+              "rel_err": 0.021967
+            }
+          },
+          "time_impact": {
+            "clean": 1.221,
+            "fit": 0.918
+          }
+        },
+        {
+          "level": 0.6,
+          "dose": {
+            "frac": 0.2,
+            "factor": 604,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.997982,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.001614269491143988,
+              "rel_err": 0.997982
+            },
+            "beta_x2": {
+              "estimate": -0.5175627680190429,
+              "rel_err": 0.035126
+            },
+            "beta_x3": {
+              "estimate": 0.033145079297371136,
+              "rel_err": 0.033145
+            }
+          },
+          "time_impact": {
+            "clean": 0.991,
+            "fit": 0.77
+          }
+        },
+        {
+          "level": 0.8,
+          "dose": {
+            "frac": 0.25,
+            "factor": 802,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.998694,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.001045138913379266,
+              "rel_err": 0.998694
+            },
+            "beta_x2": {
+              "estimate": -0.5227322802750115,
+              "rel_err": 0.045465
+            },
+            "beta_x3": {
+              "estimate": -0.002003102922748051,
+              "rel_err": 0.002003
+            }
+          },
+          "time_impact": {
+            "clean": 0.862,
+            "fit": 0.964
+          }
+        },
+        {
+          "level": 1.0,
+          "dose": {
+            "frac": 0.3,
+            "factor": 1000,
+            "col": "x1"
+          },
+          "worst_rel_err": 0.999016,
+          "class": "silent",
+          "estimands": {
+            "beta_x1": {
+              "estimate": 0.0007874462281083374,
+              "rel_err": 0.999016
+            },
+            "beta_x2": {
+              "estimate": -0.5114113389511975,
+              "rel_err": 0.022823
+            },
+            "beta_x3": {
+              "estimate": 0.029401079126964817,
+              "rel_err": 0.029401
+            }
+          },
+          "time_impact": {
+            "clean": 1.025,
+            "fit": 0.826
+          }
+        }
+      ],
+      "knee_level": 0.0,
+      "knee_dose": {
+        "frac": 0.05,
+        "factor": 10,
+        "col": "x1"
+      }
+    }
+  ],
+  "timing": {
+    "target_n": 200000,
+    "sizes": [
+      400,
+      1200,
+      4000
+    ],
+    "stages": {
+      "clean": {
+        "model": "linear",
+        "seconds": 1.74,
+        "seconds_range": [
+          1.22,
+          2.26
+        ],
+        "measured": {
+          "400": 0.2922,
+          "1200": 0.3029,
+          "4000": 0.3198
+        },
+        "peak_mem_mb": 335.6,
+        "mem_model": "nlogn",
+        "superlinear": false,
+        "flags": []
+      },
+      "fit": {
+        "model": "const",
+        "seconds": 0.3,
+        "seconds_range": [
+          0,
+          1.65
+        ],
+        "measured": {
+          "400": 0.2472,
+          "1200": 0.2978,
+          "4000": 0.2888
+        },
+        "peak_mem_mb": 68.1,
+        "mem_model": "const",
+        "superlinear": false,
+        "flags": []
+      }
+    },
+    "low_confidence": false,
+    "total_seconds": 2.04,
+    "total_range": [
+      1.22,
+      3.91
+    ],
+    "checkpoint_before": "clean",
+    "checkpoint_reason": "clean is 85% of predicted runtime; a cheap check before it saves the most time"
+  },
+  "truth": {
+    "beta_x1": 0.8,
+    "beta_x2": -0.5,
+    "beta_x3": 0.0
+  },
+  "tolerance": {
+    "relative": 0.25,
+    "absolute": 0.1
+  },
+  "baseline": {
+    "clean": {
+      "seconds": 0.289,
+      "peak_mem_mb": 67.3
+    },
+    "fit": {
+      "seconds": 0.3234,
+      "peak_mem_mb": 67.8
+    }
+  },
+  "antibodies": [
+    {
+      "id": "ab-001",
+      "title": "Leaked score column",
+      "stage": "clean",
+      "evidence": "simulated",
+      "provenance": {
+        "round": 1,
+        "stone": "target_leakage",
+        "trick": "stone",
+        "worst_rel_err": 0.9
+      }
+    }
+  ],
+  "lineup": {
+    "n_scored": 0,
+    "hits": 0,
+    "hit_rate": null,
+    "n_unscored": 0
+  },
+  "stone_characters": {
+    "correlated_block": "The Clique",
+    "mnar_missing": "The Ghost",
+    "duplicates": "The Twin",
+    "outliers": "The Spike",
+    "batch_shift": "The Drifter",
+    "measurement_error": "The Blur",
+    "target_leakage": "The Time Traveler",
+    "unit_mix": "The Metric Martian",
+    "heavy_tails": "The Long Tail",
+    "rare_category": "The Unicorn",
+    "type_corruption": "The Typo"
+  },
+  "stone_stages": [
+    "batch_shift",
+    "duplicates",
+    "mnar_missing",
+    "outliers",
+    "target_leakage"
+  ]
+}
