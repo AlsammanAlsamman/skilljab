@@ -126,4 +126,4 @@ def test_cli_smoke(skill, example):
     rc, out = cli("skill", "bump", "--skill", str(skill), "--description", "d"); assert json.loads(out)["version"] == 1
     rc, out = cli("graveyard", "search", "--skill", str(skill), "--shape", "clean,fit"); assert rc == 0
     rc, out = cli("report", "--skill", str(skill)); assert rc == 0 and pathlib.Path(json.loads(out)["report"]).exists()
-    rc, out = cli("version"); assert out.strip() == "0.1.1"
+    rc, out = cli("version"); assert out.strip() == "0.1.2"

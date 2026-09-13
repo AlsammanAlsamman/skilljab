@@ -19,7 +19,7 @@
         "worst_rel_err": 1.67
       },
       "id": "ab-001",
-      "added": "2026-09-13T06:37:41"
+      "added": "2026-09-13T06:58:39"
     },
     {
       "title": "Three columns that are the same column",
@@ -29,8 +29,11 @@
       "headsup": "The table carried monthly_charges together with derived copies (charges with tax, annualised charges, last-invoice amount). The model split the price effect arbitrarily across them; the reported coefficient for monthly_charges was 127% off and its sign is not stable between runs.",
       "mitigation": "Keep one representative per group of near-duplicate predictors; check pairwise correlations before fitting.",
       "check": {
-        "stage": "prepare",
-        "script": "checks/collinear_predictors.py"
+        "script": "checks/collinear_predictors.py",
+        "stages": [
+          "prepare",
+          "train"
+        ]
       },
       "evidence": "simulated",
       "provenance": {
@@ -40,7 +43,7 @@
         "worst_rel_err": 1.27
       },
       "id": "ab-002",
-      "added": "2026-09-13T06:37:41"
+      "added": "2026-09-13T06:58:40"
     },
     {
       "title": "Tenure is measured with noise",
@@ -57,7 +60,7 @@
         "worst_rel_err": 0.7
       },
       "id": "ab-003",
-      "added": "2026-09-13T06:37:41"
+      "added": "2026-09-13T06:58:40"
     },
     {
       "title": "dropna removed the churners",
@@ -78,7 +81,7 @@
         "worst_rel_err": 0.67
       },
       "id": "ab-004",
-      "added": "2026-09-13T06:37:41"
+      "added": "2026-09-13T06:58:40"
     },
     {
       "title": "A few impossible bills",
@@ -88,8 +91,11 @@
       "headsup": "~50 rows had monthly_charges around \u00b1$800 (a decimal slip). Logistic regression is not robust to them: the charges coefficient was off by 90%.",
       "mitigation": "Range assertions at load; winsorize or drop documented impossible values; report how many.",
       "check": {
-        "stage": "prepare",
-        "script": "checks/scale_and_outliers.py"
+        "script": "checks/scale_and_outliers.py",
+        "stages": [
+          "prepare",
+          "train"
+        ]
       },
       "evidence": "simulated",
       "provenance": {
@@ -99,18 +105,21 @@
         "worst_rel_err": 0.9
       },
       "id": "ab-005",
-      "added": "2026-09-13T06:37:42"
+      "added": "2026-09-13T06:58:41"
     },
     {
       "title": "A column that already knows the answer",
       "stage": "prepare",
       "node": "feature_selection",
-      "trigger": "a predictor with |corr| > 0.9 or single-feature AUC > 0.95 against churned",
+      "trigger": "a predictor with |corr| > 0.9 or single-feature AUC > 0.8 against churned",
       "headsup": "The model swallowed a column named churn_score_v1 \u2014 a score from an earlier model, i.e. a column computed from the outcome. AUC jumped to ~1.0 and every real driver (tenure, tickets, contract) shrank toward zero: the report would have said 'nothing matters except the score'. Customer tables are full of these: retention_offer_sent, refund_issued, account_status, days_since_cancellation \u2014 all populated after the customer decided.",
       "mitigation": "Whitelist predictors that existed before the churn decision; never 'use all columns'. Reject any feature whose single-feature AUC > 0.95.",
       "check": {
-        "stage": "prepare",
-        "script": "checks/no_leaky_columns.py"
+        "script": "checks/no_leaky_columns.py",
+        "stages": [
+          "prepare",
+          "train"
+        ]
       },
       "evidence": "simulated",
       "provenance": {
@@ -120,7 +129,7 @@
         "worst_rel_err": 57.67
       },
       "id": "ab-006",
-      "added": "2026-09-13T06:37:42"
+      "added": "2026-09-13T06:58:41"
     },
     {
       "title": "A number that arrived as text",
@@ -130,8 +139,11 @@
       "headsup": "monthly_charges came from a spreadsheet export with a few values like '1,234.50' and ' 89.9 '. pandas read the whole column as text, and get_dummies then one-hot encoded every distinct charge into ~1,400 columns. The model still ran, the coefficient for monthly_charges simply vanished, and every other coefficient was off by 2\u20137x.",
       "mitigation": "Assert dtypes on load (pd.to_numeric with errors='raise' on known numeric columns); encode only an explicit list of categoricals with fixed levels, never 'every object column'.",
       "check": {
-        "stage": "prepare",
-        "script": "checks/dummy_explosion.py"
+        "script": "checks/dummy_explosion.py",
+        "stages": [
+          "prepare",
+          "train"
+        ]
       },
       "evidence": "simulated",
       "provenance": {
@@ -141,7 +153,7 @@
         "worst_rel_err": 7.28
       },
       "id": "ab-007",
-      "added": "2026-09-13T06:37:42"
+      "added": "2026-09-13T06:58:41"
     },
     {
       "title": "Cents and dollars in the same column",
@@ -151,8 +163,11 @@
       "headsup": "15% of monthly_charges were recorded in cents (one billing region's export). The coefficient for charges collapsed to ~0 \u2014 the model concluded that price does not affect churn. No error, no warning, a clean AUC.",
       "mitigation": "Assert a plausible range per numeric column at load; plot the distribution per data source before modelling.",
       "check": {
-        "stage": "prepare",
-        "script": "checks/scale_and_outliers.py"
+        "script": "checks/scale_and_outliers.py",
+        "stages": [
+          "prepare",
+          "train"
+        ]
       },
       "evidence": "simulated",
       "provenance": {
@@ -162,7 +177,7 @@
         "worst_rel_err": 1.0
       },
       "id": "ab-008",
-      "added": "2026-09-13T06:37:43"
+      "added": "2026-09-13T06:58:41"
     }
   ]
 }

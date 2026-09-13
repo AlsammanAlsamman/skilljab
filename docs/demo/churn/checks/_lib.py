@@ -1,6 +1,9 @@
 import sys, json, pandas as pd
 def load(argv):
-    out = pd.read_csv(argv[1]); inp = pd.read_csv(argv[2]) if len(argv) > 2 else None
+    """(stage_output, stage_input). A non-CSV output (result.json) yields out=None; use inp then."""
+    out = pd.read_csv(argv[1]) if argv[1].endswith(".csv") else None
+    inp = pd.read_csv(argv[2]) if len(argv) > 2 else None
+    if out is None and inp is not None: out = inp
     return out, inp
 def outcome(df):
     for c in ("churned", "y", "outcome", "target", "label"):

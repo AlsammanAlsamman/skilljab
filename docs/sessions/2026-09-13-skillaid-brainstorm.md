@@ -1677,3 +1677,136 @@ First, the simulator needs named features (`tenure_months`, `contract_type`…) 
 
 ---
 
+**Claude**
+
+Done. The test is built, replayed from scratch, and it makes the case.
+
+## The test: the churn model Claude wrote
+
+The everyday prompt — *"here's our customer CSV, build a churn model, which factors matter?"* — and the pipeline Claude produces for it (`dropna` → `get_dummies` → logistic regression on everything). On clean data it's right: AUC 0.73, factors ranked correctly.
+
+Ten stones, one per round, each a thing real customer tables do:
+
+| | stone | the AI's pipeline reported | warned? |
+|---|---|---|---|
+| 1 | a `churn_score_v1` column from an old model | AUC 1.0, "nothing matters but the score" | **no** |
+| 2 | `monthly_charges` exported as text | 1,400 one-hot columns; price coefficient gone | **no** |
+| 3 | support history purged for closed accounts | `dropna` removed the churners; ticket effect 67% low | **no** |
+| 4 | billing join duplicated rows | fine (estimates) | harmless |
+| 5 | one region bills in cents | "price doesn't affect churn" | **no** |
+| 6 | unlabelled channel, pricier and churnier | every coefficient ~100% off | **no** |
+| 7 | new `enterprise` plan, 2 customers | fine | harmless |
+| 8 | ~50 bills at ±$800 | price effect 90% off | **no** |
+| 9 | charges + with-tax + annualised | price split three ways, sign unstable | **no** |
+| 10 | tenure from a noisy invoice date | tenure effect 70% low, mis-ranked | **no** |
+
+**8 of 10 silent.** Then six antibody checkers, written with the domain explanation each exists for. Same stones again: **6 caught, 2 still silent** — and for those two the skill says outright that the data can't reveal them and which columns to ask for. Report headline: *"The Time Traveler hit stage prepare — `beta_contract_one_year` moved 5767% from the planted truth and nothing warned you."*
+
+## What's in the repo
+
+- `examples/churn_ai_pipeline/` — prompt, pipeline, spec, 3 persona plans + lineup, 6 checkers, 8 antibodies, `README.md` with the story, `run_demo.sh` (replays everything in ~3 min; verified end to end)
+- `docs/demo/churn/` — the rendered report, `SKILL.md`, antibodies, tree, checks
+- `assets/report/churn/` — six section screenshots (headless Chrome), now used in the main README's report section, which is rewritten around this test
+- Engine improvements the test forced: named features and categorical effects in the simulator, checkers get the stage *input* as a second argument (needed for "missingness by outcome"), outcome-aware stones, `batch_shift` keeps prevalence on binary outcomes, a `type_corruption` crash, sweep "knee" = first degradation with `silent_from` separate, shared checkers deduped. 47 tests pass, plugin validates.
+
+**Version is bumped to 0.1.1 locally but not uploaded** — the published 0.1.0 doesn't have the simulator/runner changes the churn demo needs. Say the word and I'll upload 0.1.1 (if you've already revoked the token, I'll need a new one).
+
+---
+
+**User**
+
+did you update the readme
+
+---
+
+**Claude**
+
+Yes. `README.md` now has, in order:
+
+1. Mascot (rounded PNG), the tagline *"Your AI writes the analysis. SkillJab makes sure it's right before you spend the six hours finding out."*
+2. **The problem you already have**
+3. **What it does for you** — the five things in the user's terms
+4. **A real test: the churn model Claude wrote** — *new*: the prompt, the pipeline, the 8-of-10 table, then "6 caught, 2 honestly still silent", with links to `examples/churn_ai_pipeline/` and `docs/demo/churn/`
+5. **The report** — *rewritten*: six screenshots from the churn run (headline + stars, twin slider, breaking-point curves, fragility matrix, lap times, immunity record), each with one line on what it tells you
+6. What you get in your repo · Quick start (now points to `run_demo.sh` first) · How it stays honest · The stones · Your pipeline's contract · Honest limits · Development · Author
+
+Let me double-check the file on disk matches that, since it was edited in two passes.
+
+---
+
+**Claude**
+
+Confirmed on disk. One thing to keep in mind: all seven images (mascot + six report crops) point at `raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/…`, so they render only after you push to that repo. Until then, viewing `README.md` locally or on PyPI shows broken image slots. If you'd rather see it locally now, I can switch them to relative paths (`assets/report/churn/…`) — GitHub renders those fine too; only PyPI needs the absolute form.
+
+---
+
+**User**
+
+should i update the pip project right
+
+---
+
+**Claude**
+
+Yes — and it's worth doing before you push to GitHub, for one concrete reason: the README on PyPI 0.1.0 promises the churn demo (`run_demo.sh`), but the 0.1.0 wheel doesn't have the simulator and runner changes the demo needs (named features, checker input argument, the stone fixes). Anyone who `pipx install skilljab` today and runs the demo gets a crash. 0.1.1 fixes that.
+
+Everything is ready locally: version is bumped to 0.1.1 in `pyproject.toml`, `__init__.py`, and the plugin manifest; tests pass; the package builds.
+
+To upload I need a token. The one you pasted earlier should be treated as burned (it's in this chat), so:
+
+1. pypi.org → Account settings → API tokens → **revoke** the old one
+2. **Add API token** → scope it to *Project: skilljab* (it exists now, so project scoping is available) → copy it
+3. Paste it here and I'll upload — or run it yourself:
+
+```bash
+cd ~/Documents/MyGitHub/skilljab
+rm -rf dist && pipx run build && pipx run twine check dist/*
+TWINE_USERNAME=__token__ TWINE_PASSWORD='pypi-…' pipx run twine upload dist/*
+```
+
+After that, `pipx upgrade skilljab` gets everyone to 0.1.1, and the README on PyPI will match what the package can do.
+
+---
+
+**User**
+
+you update now [REDACTED]
+
+---
+
+**Claude**
+
+**skilljab 0.1.1 is live** — https://pypi.org/project/skilljab/0.1.1/
+
+Verified the way a new user would hit it: fresh `pipx install skilljab` → `0.1.1` → copied the churn example → `./run_demo.sh` from the published wheel: clean recovery passes, `target_leakage` silent in round 1, caught in round 11. The demo now works from PyPI, and the README on the PyPI page matches what the package can do.
+
+Housekeeping:
+- Your dev install is back to editable mode (`pipx install -e .`), so `skilljab` tracks the repo while you work.
+- This token was project-scoped, which is the right shape — but it's in this chat too, so revoke it and mint another when you next release. For the future, `pipx run twine upload dist/*` with `TWINE_USERNAME=__token__` and the token in `TWINE_PASSWORD` keeps it out of chat entirely; or set up PyPI's *trusted publishing* from a GitHub Action once the repo is up and never handle tokens again.
+- Remaining step is yours: `git init`, commit, push to `AlsammanAlsamman/skilljab` — at which point the README images light up on both GitHub and PyPI.
+
+---
+
+**User**
+
+does the examples shows that the tool is useful
+
+---
+
+**Claude**
+
+Partly. Let me be precise about what it does and doesn't show, because a skeptical reader will see the gap.
+
+**What the churn example shows convincingly**
+- The AI-written pipeline is fragile in ways nobody would notice: 8 of 10 realistic perturbations silently corrupt the answer, with a clean AUC. That's the strongest claim in the whole project and the example proves it without any hand-waving.
+- The verdicts are honest — two stones were "harmless" and the tool said so; two failures remain unguardable and the skill says which columns to ask for.
+
+**What it doesn't show yet**
+- I planted the stones *and* wrote the checkers, in the same session, knowing what was planted. A skeptic will say: "of course a check written for stone X catches stone X." The immunization loop closing is real, but it's circular as evidence.
+- The "wake-up" claim — that a silent failure makes the AI recall domain knowledge it wasn't applying — hasn't been tested blind. The explainer was me, with full knowledge.
+- Nothing yet shows the tool catching something *nobody planted*. That's the moment that makes a tool feel useful rather than clever.
+
+The cheapest way to close the first gap is a hold-out test: throw stones the checkers were *not* written for at the immunized pipeline and see what the antibodies catch. Let me run that now — it's a real answer, not an argument.
+
+---
+

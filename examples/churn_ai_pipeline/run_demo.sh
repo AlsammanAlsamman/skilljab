@@ -15,7 +15,7 @@ skilljab tree build plans/*.json --out $S/tree.json >/dev/null
 skilljab lineup score --skill $S --lineup plans/lineup.json | grep hit
 
 run() { skilljab round new --skill $S >/dev/null; skilljab round stones --skill $S "$1" --level "$2" ${3:+--dose "$3"} >/dev/null
-        skilljab round run --skill $S | python3 -c "import json,sys; d=json.load(sys.stdin); print(f'   {\"$1\":18s} -> {d[\"class\"]:9s} fired: {[c[\"script\"].split(\"/\")[-1] for c in d[\"checks_fired\"]]}')"; }
+        skilljab round run --skill $S | python3 -c "import json,sys; d=json.load(sys.stdin); print(f'   {\"$1\":18s} -> {d[\"class\"]:9s} fired: {sorted({c[\"script\"].split(\"/\")[-1] for c in d[\"checks_fired\"]})}')"; }
 STONES=(
  'target_leakage    0.7 {"target_leakage":{"name":"churn_score_v1","noise_sd":0.3}}'
  'type_corruption   0.6 {"type_corruption":{"col":"monthly_charges"}}'

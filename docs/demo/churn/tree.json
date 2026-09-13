@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "built": "2026-09-13T06:37:22",
+  "built": "2026-09-13T06:58:20",
   "nodes": [
     {
       "id": "missing_handling",
@@ -21,7 +21,7 @@
               "summary": "mnar_missing on support_tickets: effect 67% too small",
               "verdict": "silent",
               "round": 3,
-              "added": "2026-09-13T06:37:43"
+              "added": "2026-09-13T06:58:42"
             }
           ],
           "status": "rejected"
@@ -53,7 +53,7 @@
               "summary": "missingness_by_outcome.py fires",
               "verdict": "caught",
               "round": 13,
-              "added": "2026-09-13T06:37:44"
+              "added": "2026-09-13T06:58:43"
             }
           ],
           "status": "default"
@@ -79,7 +79,7 @@
               "summary": "target_leakage: churn_score_v1 swallowed, AUC ~1, drivers -> 0",
               "verdict": "silent",
               "round": 1,
-              "added": "2026-09-13T06:37:43"
+              "added": "2026-09-13T06:58:42"
             }
           ],
           "status": "rejected"
@@ -111,7 +111,7 @@
               "summary": "no_leaky_columns.py catches the leak",
               "verdict": "caught",
               "round": 11,
-              "added": "2026-09-13T06:37:43"
+              "added": "2026-09-13T06:58:42"
             }
           ],
           "status": "default"
@@ -137,7 +137,7 @@
               "summary": "type_corruption: numeric-as-text one-hot into ~1,400 columns",
               "verdict": "silent",
               "round": 2,
-              "added": "2026-09-13T06:37:44"
+              "added": "2026-09-13T06:58:43"
             }
           ],
           "status": "rejected"
@@ -159,7 +159,7 @@
               "summary": "dummy_explosion.py fires",
               "verdict": "caught",
               "round": 12,
-              "added": "2026-09-13T06:37:44"
+              "added": "2026-09-13T06:58:43"
             }
           ],
           "status": "default"
@@ -185,7 +185,7 @@
               "summary": "duplicates: point estimates unchanged (standard errors would be wrong)",
               "verdict": "harmless",
               "round": 4,
-              "added": "2026-09-13T06:37:45"
+              "added": "2026-09-13T06:58:44"
             }
           ],
           "status": "open"

@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "skilljab",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Immunize an analysis by sabotaging it before it sees real data - and keep the antibodies as a skill. Requires the `skilljab` CLI (pip install skilljab).",
   "author": { "name": "Alsamman M. Alsamman", "email": "aalsamman100@gmail.com" },
   "keywords": ["data-analysis", "simulation", "chaos", "skills", "statistics", "pipelines"]

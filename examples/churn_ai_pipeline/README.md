@@ -50,18 +50,20 @@ missing, a milder hidden batch, and cents/dollars introduced *between* the two s
 | hold-out perturbation | result |
 |---|---|
 | tenure ×12 for some rows | **caught** by `scale_and_outliers` |
-| MNAR on `monthly_charges` | false alarm — check fired, estimates survived |
+| MNAR on `monthly_charges` | check fired; estimates survived this seed (false alarm) |
 | `support_tickets` as text | **caught** by `dummy_explosion` |
 | impossible tenure values | **caught** by `scale_and_outliers` |
-| derived copies of tenure | **caught** by `collinear_predictors` |
+| derived copies of tenure | check fired; estimates survived this seed (false alarm) |
 | leak, noise 0.6 sd | **caught** by `no_leaky_columns` |
-| leak, noise 1.2 sd (83× error) | **caught** by `no_leaky_columns` |
+| leak, noise 1.2 sd | check fired; estimates survived this seed (false alarm) |
 | outcome itself missing | **caught** by `missingness_by_outcome` |
 | hidden batch on tickets | silent — the known unguardable |
 | cents/dollars after `prepare` | **caught** at the `train` boundary |
 
-Eight of ten caught by antibodies written for something else; the one miss is the batch the skill already
-says it cannot see. The first pass of this hold-out was worse — the very noisy leak got through (the leak
+Nine of ten flagged by antibodies written for something else — six where the result had actually
+broken, three where the check fired on a genuinely bad column but the estimates happened to survive
+that seed (the engine is strict: that counts as a false alarm, not a catch). The one miss is the batch
+the skill already says it cannot see. The first pass of this hold-out was worse — the very noisy leak got through (the leak
 check's threshold was too strict) and the between-stages stone was silent (checks only ran after
 `prepare`). Both are fixed above; that is the loop doing its job, and it is in the replay so you can watch
 it happen.

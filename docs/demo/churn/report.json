@@ -1,7 +1,7 @@
 {
   "name": "churn",
   "version": 1,
-  "generated": "2026-09-13T06:40:01",
+  "generated": "2026-09-13T07:02:47",
   "headline": "Round 1: The Time Traveler (target_leakage) hit stage prepare \u2014 `beta_contract_one_year` moved 5767% from the planted truth and nothing warned you.",
   "stage_ids": [
     "prepare",
@@ -9,24 +9,24 @@
   ],
   "stages": {
     "prepare": {
-      "n_stones": 20,
-      "silent": 10,
+      "n_stones": 29,
+      "silent": 11,
       "crashed": 0,
-      "caught": 6,
+      "caught": 11,
       "harmless": 4,
       "worst_rel_err": 57.673,
-      "stars": 2,
-      "baseline_seconds": 0.253
+      "stars": 3,
+      "baseline_seconds": 0.2689
     },
     "train": {
-      "n_stones": 0,
+      "n_stones": 1,
       "silent": 0,
       "crashed": 0,
-      "caught": 0,
+      "caught": 1,
       "harmless": 0,
-      "worst_rel_err": 0,
+      "worst_rel_err": 0.999,
       "stars": 5,
-      "baseline_seconds": 0.4946
+      "baseline_seconds": 0.5885
     }
   },
   "rounds": [
@@ -43,8 +43,8 @@
       "worst_rel_err": 57.672955,
       "checks_fired": [],
       "time_impact": {
-        "prepare": 0.881,
-        "train": 1.018
+        "prepare": 1.008,
+        "train": 1.01
       },
       "estimands": {
         "beta_tenure_months": {
@@ -104,8 +104,8 @@
       "worst_rel_err": 7.276956,
       "checks_fired": [],
       "time_impact": {
-        "prepare": 3.572,
-        "train": 2.636
+        "prepare": 2.813,
+        "train": 1.934
       },
       "estimands": {
         "beta_tenure_months": {
@@ -166,8 +166,8 @@
       "worst_rel_err": 0.668017,
       "checks_fired": [],
       "time_impact": {
-        "prepare": 1.016,
-        "train": 1.008
+        "prepare": 0.863,
+        "train": 1.023
       },
       "estimands": {
         "beta_tenure_months": {
@@ -226,8 +226,8 @@
       "worst_rel_err": 0.223675,
       "checks_fired": [],
       "time_impact": {
-        "prepare": 1.074,
-        "train": 1.003
+        "prepare": 1.035,
+        "train": 1.037
       },
       "estimands": {
         "beta_tenure_months": {
@@ -288,8 +288,8 @@
       "worst_rel_err": 0.997824,
       "checks_fired": [],
       "time_impact": {
-        "prepare": 1.05,
-        "train": 1.222
+        "prepare": 0.852,
+        "train": 0.888
       },
       "estimands": {
         "beta_tenure_months": {
@@ -350,8 +350,8 @@
       "worst_rel_err": 1.672826,
       "checks_fired": [],
       "time_impact": {
-        "prepare": 1.039,
-        "train": 1.015
+        "prepare": 0.848,
+        "train": 1.024
       },
       "estimands": {
         "beta_tenure_months": {
@@ -411,8 +411,8 @@
       "worst_rel_err": 0.201567,
       "checks_fired": [],
       "time_impact": {
-        "prepare": 1.085,
-        "train": 0.994
+        "prepare": 1.026,
+        "train": 1.067
       },
       "estimands": {
         "beta_tenure_months": {
@@ -474,8 +474,8 @@
       "worst_rel_err": 0.900162,
       "checks_fired": [],
       "time_impact": {
-        "prepare": 1.074,
-        "train": 1.018
+        "prepare": 0.841,
+        "train": 1.013
       },
       "estimands": {
         "beta_tenure_months": {
@@ -536,8 +536,8 @@
       "worst_rel_err": 1.267456,
       "checks_fired": [],
       "time_impact": {
-        "prepare": 0.906,
-        "train": 1.237
+        "prepare": 1.038,
+        "train": 1.081
       },
       "estimands": {
         "beta_tenure_months": {
@@ -597,8 +597,8 @@
       "worst_rel_err": 0.703931,
       "checks_fired": [],
       "time_impact": {
-        "prepare": 0.898,
-        "train": 1.022
+        "prepare": 1.108,
+        "train": 1.055
       },
       "estimands": {
         "beta_tenure_months": {
@@ -657,11 +657,12 @@
       "class": "caught",
       "worst_rel_err": 21.863488,
       "checks_fired": [
+        "checks/no_leaky_columns.py",
         "checks/no_leaky_columns.py"
       ],
       "time_impact": {
-        "prepare": 1.277,
-        "train": 1.217
+        "prepare": 1.057,
+        "train": 0.88
       },
       "estimands": {
         "beta_tenure_months": {
@@ -720,11 +721,12 @@
       "class": "caught",
       "worst_rel_err": 13.339252,
       "checks_fired": [
+        "checks/dummy_explosion.py",
         "checks/dummy_explosion.py"
       ],
       "time_impact": {
-        "prepare": 3.817,
-        "train": 2.505
+        "prepare": 2.912,
+        "train": 1.953
       },
       "estimands": {
         "beta_tenure_months": {
@@ -787,8 +789,8 @@
         "checks/missingness_by_outcome.py"
       ],
       "time_impact": {
-        "prepare": 1.036,
-        "train": 1.291
+        "prepare": 0.861,
+        "train": 1.062
       },
       "estimands": {
         "beta_tenure_months": {
@@ -847,8 +849,8 @@
       "worst_rel_err": 0.259458,
       "checks_fired": [],
       "time_impact": {
-        "prepare": 0.929,
-        "train": 1.052
+        "prepare": 1.077,
+        "train": 0.886
       },
       "estimands": {
         "beta_tenure_months": {
@@ -908,11 +910,12 @@
       "class": "caught",
       "worst_rel_err": 0.997853,
       "checks_fired": [
+        "checks/scale_and_outliers.py",
         "checks/scale_and_outliers.py"
       ],
       "time_impact": {
-        "prepare": 1.129,
-        "train": 1.089
+        "prepare": 1.062,
+        "train": 1.081
       },
       "estimands": {
         "beta_tenure_months": {
@@ -973,8 +976,8 @@
       "worst_rel_err": 1.714022,
       "checks_fired": [],
       "time_impact": {
-        "prepare": 1.286,
-        "train": 1.051
+        "prepare": 1.098,
+        "train": 0.867
       },
       "estimands": {
         "beta_tenure_months": {
@@ -1034,8 +1037,8 @@
       "worst_rel_err": 0.201567,
       "checks_fired": [],
       "time_impact": {
-        "prepare": 1.081,
-        "train": 1.222
+        "prepare": 1.074,
+        "train": 0.889
       },
       "estimands": {
         "beta_tenure_months": {
@@ -1096,11 +1099,12 @@
       "class": "caught",
       "worst_rel_err": 0.999331,
       "checks_fired": [
+        "checks/scale_and_outliers.py",
         "checks/scale_and_outliers.py"
       ],
       "time_impact": {
-        "prepare": 0.918,
-        "train": 1.317
+        "prepare": 0.873,
+        "train": 1.068
       },
       "estimands": {
         "beta_tenure_months": {
@@ -1160,11 +1164,12 @@
       "class": "caught",
       "worst_rel_err": 1.295299,
       "checks_fired": [
+        "checks/collinear_predictors.py",
         "checks/collinear_predictors.py"
       ],
       "time_impact": {
-        "prepare": 1.001,
-        "train": 1.186
+        "prepare": 1.07,
+        "train": 1.122
       },
       "estimands": {
         "beta_tenure_months": {
@@ -1224,8 +1229,8 @@
       "worst_rel_err": 0.599932,
       "checks_fired": [],
       "time_impact": {
-        "prepare": 1.13,
-        "train": 1.054
+        "prepare": 1.071,
+        "train": 0.938
       },
       "estimands": {
         "beta_tenure_months": {
@@ -1261,6 +1266,646 @@
           "estimate": -1.4568217914468848,
           "abs_err": 0.143178,
           "rel_err": 0.089486,
+          "degraded": false
+        },
+        "prevalence": {
+          "truth": 0.3885841342018384,
+          "estimate": 0.37133333333333335,
+          "abs_err": 0.017251,
+          "rel_err": 0.044394,
+          "degraded": false
+        }
+      }
+    },
+    {
+      "round": 21,
+      "stone": "unit_mix",
+      "character": "The Metric Martian",
+      "dose": {
+        "frac": 0.2,
+        "factor": 12,
+        "col": "tenure_months"
+      },
+      "stage": "prepare",
+      "class": "caught",
+      "worst_rel_err": 0.956463,
+      "checks_fired": [
+        "checks/scale_and_outliers.py",
+        "checks/scale_and_outliers.py"
+      ],
+      "time_impact": {
+        "prepare": 0.886,
+        "train": 0.892
+      },
+      "estimands": {
+        "beta_tenure_months": {
+          "truth": -0.04,
+          "estimate": -0.0017414775554720665,
+          "abs_err": 0.038259,
+          "rel_err": 0.956463,
+          "degraded": true
+        },
+        "beta_monthly_charges": {
+          "truth": 0.012,
+          "estimate": 0.012049607361270243,
+          "abs_err": 5e-05,
+          "rel_err": 0.004134,
+          "degraded": false
+        },
+        "beta_support_tickets": {
+          "truth": 0.35,
+          "estimate": 0.3887733404882705,
+          "abs_err": 0.038773,
+          "rel_err": 0.110781,
+          "degraded": false
+        },
+        "beta_contract_one_year": {
+          "truth": -0.8,
+          "estimate": -0.8123275535588891,
+          "abs_err": 0.012328,
+          "rel_err": 0.015409,
+          "degraded": false
+        },
+        "beta_contract_two_year": {
+          "truth": -1.6,
+          "estimate": -1.4449129511340046,
+          "abs_err": 0.155087,
+          "rel_err": 0.096929,
+          "degraded": false
+        },
+        "prevalence": {
+          "truth": 0.3885841342018384,
+          "estimate": 0.37133333333333335,
+          "abs_err": 0.017251,
+          "rel_err": 0.044394,
+          "degraded": false
+        }
+      }
+    },
+    {
+      "round": 22,
+      "stone": "mnar_missing",
+      "character": "The Ghost",
+      "dose": {
+        "frac": 0.22499999999999998,
+        "col": "monthly_charges",
+        "target": "feature"
+      },
+      "stage": "prepare",
+      "class": "false_alarm",
+      "worst_rel_err": 0.215459,
+      "checks_fired": [
+        "checks/missingness_by_outcome.py"
+      ],
+      "time_impact": {
+        "prepare": 1.084,
+        "train": 0.972
+      },
+      "estimands": {
+        "beta_tenure_months": {
+          "truth": -0.04,
+          "estimate": -0.03138164187524437,
+          "abs_err": 0.008618,
+          "rel_err": 0.215459,
+          "degraded": false
+        },
+        "beta_monthly_charges": {
+          "truth": 0.012,
+          "estimate": 0.01205069898981278,
+          "abs_err": 5.1e-05,
+          "rel_err": 0.004225,
+          "degraded": false
+        },
+        "beta_support_tickets": {
+          "truth": 0.35,
+          "estimate": 0.3742085030920307,
+          "abs_err": 0.024209,
+          "rel_err": 0.069167,
+          "degraded": false
+        },
+        "beta_contract_one_year": {
+          "truth": -0.8,
+          "estimate": -0.75036336914756,
+          "abs_err": 0.049637,
+          "rel_err": 0.062046,
+          "degraded": false
+        },
+        "beta_contract_two_year": {
+          "truth": -1.6,
+          "estimate": -1.4954112972218827,
+          "abs_err": 0.104589,
+          "rel_err": 0.065368,
+          "degraded": false
+        },
+        "prevalence": {
+          "truth": 0.3885841342018384,
+          "estimate": 0.34995700773860705,
+          "abs_err": 0.038627,
+          "rel_err": 0.099405,
+          "degraded": false
+        }
+      }
+    },
+    {
+      "round": 23,
+      "stone": "type_corruption",
+      "character": "The Typo",
+      "dose": {
+        "frac": 0.064,
+        "col": "support_tickets"
+      },
+      "stage": "prepare",
+      "class": "caught",
+      "worst_rel_err": 0.252844,
+      "checks_fired": [
+        "checks/dummy_explosion.py"
+      ],
+      "time_impact": {
+        "prepare": 0.939,
+        "train": 1.37
+      },
+      "estimands": {
+        "beta_tenure_months": {
+          "truth": -0.04,
+          "estimate": -0.029886229189758758,
+          "abs_err": 0.010114,
+          "rel_err": 0.252844,
+          "degraded": false
+        },
+        "beta_monthly_charges": {
+          "truth": 0.012,
+          "estimate": 0.012062656748493668,
+          "abs_err": 6.3e-05,
+          "rel_err": 0.005221,
+          "degraded": false
+        },
+        "beta_support_tickets": {
+          "truth": 0.35,
+          "estimate": null,
+          "abs_err": null,
+          "rel_err": null,
+          "degraded": true
+        },
+        "beta_contract_one_year": {
+          "truth": -0.8,
+          "estimate": -0.8380004285155326,
+          "abs_err": 0.038,
+          "rel_err": 0.047501,
+          "degraded": false
+        },
+        "beta_contract_two_year": {
+          "truth": -1.6,
+          "estimate": -1.4509343238048673,
+          "abs_err": 0.149066,
+          "rel_err": 0.093166,
+          "degraded": false
+        },
+        "prevalence": {
+          "truth": 0.3885841342018384,
+          "estimate": 0.37330623306233063,
+          "abs_err": 0.015278,
+          "rel_err": 0.039317,
+          "degraded": false
+        }
+      }
+    },
+    {
+      "round": 24,
+      "stone": "outliers",
+      "character": "The Spike",
+      "dose": {
+        "frac": 0.0365,
+        "scale": 15,
+        "col": "tenure_months",
+        "target": "feature"
+      },
+      "stage": "prepare",
+      "class": "caught",
+      "worst_rel_err": 0.95142,
+      "checks_fired": [
+        "checks/scale_and_outliers.py",
+        "checks/scale_and_outliers.py"
+      ],
+      "time_impact": {
+        "prepare": 1.514,
+        "train": 0.879
+      },
+      "estimands": {
+        "beta_tenure_months": {
+          "truth": -0.04,
+          "estimate": -0.0019432156207343009,
+          "abs_err": 0.038057,
+          "rel_err": 0.95142,
+          "degraded": true
+        },
+        "beta_monthly_charges": {
+          "truth": 0.012,
+          "estimate": 0.01223700162136238,
+          "abs_err": 0.000237,
+          "rel_err": 0.01975,
+          "degraded": false
+        },
+        "beta_support_tickets": {
+          "truth": 0.35,
+          "estimate": 0.39068100582015614,
+          "abs_err": 0.040681,
+          "rel_err": 0.116231,
+          "degraded": false
+        },
+        "beta_contract_one_year": {
+          "truth": -0.8,
+          "estimate": -0.788785964366125,
+          "abs_err": 0.011214,
+          "rel_err": 0.014018,
+          "degraded": false
+        },
+        "beta_contract_two_year": {
+          "truth": -1.6,
+          "estimate": -1.440147422312479,
+          "abs_err": 0.159853,
+          "rel_err": 0.099908,
+          "degraded": false
+        },
+        "prevalence": {
+          "truth": 0.3885841342018384,
+          "estimate": 0.37133333333333335,
+          "abs_err": 0.017251,
+          "rel_err": 0.044394,
+          "degraded": false
+        }
+      }
+    },
+    {
+      "round": 25,
+      "stone": "correlated_block",
+      "character": "The Clique",
+      "dose": {
+        "n_copies": 2,
+        "rho": 0.976,
+        "col": "tenure_months"
+      },
+      "stage": "prepare",
+      "class": "false_alarm",
+      "worst_rel_err": 0.230654,
+      "checks_fired": [
+        "checks/collinear_predictors.py",
+        "checks/collinear_predictors.py"
+      ],
+      "time_impact": {
+        "prepare": 1.134,
+        "train": 1.178
+      },
+      "estimands": {
+        "beta_tenure_months": {
+          "truth": -0.04,
+          "estimate": -0.030773846047129478,
+          "abs_err": 0.009226,
+          "rel_err": 0.230654,
+          "degraded": false
+        },
+        "beta_monthly_charges": {
+          "truth": 0.012,
+          "estimate": 0.011768488677936699,
+          "abs_err": 0.000232,
+          "rel_err": 0.019293,
+          "degraded": false
+        },
+        "beta_support_tickets": {
+          "truth": 0.35,
+          "estimate": 0.3995184310737775,
+          "abs_err": 0.049518,
+          "rel_err": 0.141481,
+          "degraded": false
+        },
+        "beta_contract_one_year": {
+          "truth": -0.8,
+          "estimate": -0.8328439872682036,
+          "abs_err": 0.032844,
+          "rel_err": 0.041055,
+          "degraded": false
+        },
+        "beta_contract_two_year": {
+          "truth": -1.6,
+          "estimate": -1.482805024957171,
+          "abs_err": 0.117195,
+          "rel_err": 0.073247,
+          "degraded": false
+        },
+        "prevalence": {
+          "truth": 0.3885841342018384,
+          "estimate": 0.37133333333333335,
+          "abs_err": 0.017251,
+          "rel_err": 0.044394,
+          "degraded": false
+        }
+      }
+    },
+    {
+      "round": 26,
+      "stone": "target_leakage",
+      "character": "The Time Traveler",
+      "dose": {
+        "noise_sd": 0.6,
+        "name": "days_to_cancel"
+      },
+      "stage": "prepare",
+      "class": "caught",
+      "worst_rel_err": 0.693574,
+      "checks_fired": [
+        "checks/no_leaky_columns.py",
+        "checks/no_leaky_columns.py"
+      ],
+      "time_impact": {
+        "prepare": 1.035,
+        "train": 0.903
+      },
+      "estimands": {
+        "beta_tenure_months": {
+          "truth": -0.04,
+          "estimate": -0.03687051151877079,
+          "abs_err": 0.003129,
+          "rel_err": 0.078237,
+          "degraded": false
+        },
+        "beta_monthly_charges": {
+          "truth": 0.012,
+          "estimate": 0.003677107066564691,
+          "abs_err": 0.008323,
+          "rel_err": 0.693574,
+          "degraded": false
+        },
+        "beta_support_tickets": {
+          "truth": 0.35,
+          "estimate": 0.5643573355371654,
+          "abs_err": 0.214357,
+          "rel_err": 0.61245,
+          "degraded": true
+        },
+        "beta_contract_one_year": {
+          "truth": -0.8,
+          "estimate": -1.2419655808822496,
+          "abs_err": 0.441966,
+          "rel_err": 0.552457,
+          "degraded": true
+        },
+        "beta_contract_two_year": {
+          "truth": -1.6,
+          "estimate": -1.473342224627327,
+          "abs_err": 0.126658,
+          "rel_err": 0.079161,
+          "degraded": false
+        },
+        "prevalence": {
+          "truth": 0.3885841342018384,
+          "estimate": 0.37133333333333335,
+          "abs_err": 0.017251,
+          "rel_err": 0.044394,
+          "degraded": false
+        }
+      }
+    },
+    {
+      "round": 27,
+      "stone": "target_leakage",
+      "character": "The Time Traveler",
+      "dose": {
+        "noise_sd": 1.2,
+        "name": "risk_flag"
+      },
+      "stage": "prepare",
+      "class": "false_alarm",
+      "worst_rel_err": 0.221007,
+      "checks_fired": [
+        "checks/no_leaky_columns.py",
+        "checks/no_leaky_columns.py"
+      ],
+      "time_impact": {
+        "prepare": 1.054,
+        "train": 1.14
+      },
+      "estimands": {
+        "beta_tenure_months": {
+          "truth": -0.04,
+          "estimate": -0.031159711240560075,
+          "abs_err": 0.00884,
+          "rel_err": 0.221007,
+          "degraded": false
+        },
+        "beta_monthly_charges": {
+          "truth": 0.012,
+          "estimate": 0.010438180306609013,
+          "abs_err": 0.001562,
+          "rel_err": 0.130152,
+          "degraded": false
+        },
+        "beta_support_tickets": {
+          "truth": 0.35,
+          "estimate": 0.41057140266104686,
+          "abs_err": 0.060571,
+          "rel_err": 0.173061,
+          "degraded": false
+        },
+        "beta_contract_one_year": {
+          "truth": -0.8,
+          "estimate": -0.9615937181011429,
+          "abs_err": 0.161594,
+          "rel_err": 0.201992,
+          "degraded": false
+        },
+        "beta_contract_two_year": {
+          "truth": -1.6,
+          "estimate": -1.6884746260665038,
+          "abs_err": 0.088475,
+          "rel_err": 0.055297,
+          "degraded": false
+        },
+        "prevalence": {
+          "truth": 0.3885841342018384,
+          "estimate": 0.37133333333333335,
+          "abs_err": 0.017251,
+          "rel_err": 0.044394,
+          "degraded": false
+        }
+      }
+    },
+    {
+      "round": 28,
+      "stone": "mnar_missing",
+      "character": "The Ghost",
+      "dose": {
+        "frac": 0.25,
+        "target": "outcome"
+      },
+      "stage": "prepare",
+      "class": "caught",
+      "worst_rel_err": 0.583674,
+      "checks_fired": [
+        "checks/missingness_by_outcome.py"
+      ],
+      "time_impact": {
+        "prepare": 1.041,
+        "train": 0.997
+      },
+      "estimands": {
+        "beta_tenure_months": {
+          "truth": -0.04,
+          "estimate": -0.03152626522133735,
+          "abs_err": 0.008474,
+          "rel_err": 0.211843,
+          "degraded": false
+        },
+        "beta_monthly_charges": {
+          "truth": 0.012,
+          "estimate": 0.011340640830569617,
+          "abs_err": 0.000659,
+          "rel_err": 0.054947,
+          "degraded": false
+        },
+        "beta_support_tickets": {
+          "truth": 0.35,
+          "estimate": 0.41333209687609224,
+          "abs_err": 0.063332,
+          "rel_err": 0.180949,
+          "degraded": false
+        },
+        "beta_contract_one_year": {
+          "truth": -0.8,
+          "estimate": -0.628079339257,
+          "abs_err": 0.171921,
+          "rel_err": 0.214901,
+          "degraded": false
+        },
+        "beta_contract_two_year": {
+          "truth": -1.6,
+          "estimate": -1.5550975289069582,
+          "abs_err": 0.044902,
+          "rel_err": 0.028064,
+          "degraded": false
+        },
+        "prevalence": {
+          "truth": 0.3885841342018384,
+          "estimate": 0.16177777777777777,
+          "abs_err": 0.226806,
+          "rel_err": 0.583674,
+          "degraded": true
+        }
+      }
+    },
+    {
+      "round": 29,
+      "stone": "batch_shift",
+      "character": "The Drifter",
+      "dose": {
+        "frac": 0.35,
+        "shift": 2.5,
+        "col": "support_tickets"
+      },
+      "stage": "prepare",
+      "class": "silent",
+      "worst_rel_err": 0.820671,
+      "checks_fired": [],
+      "time_impact": {
+        "prepare": 1.043,
+        "train": 1.006
+      },
+      "estimands": {
+        "beta_tenure_months": {
+          "truth": -0.04,
+          "estimate": -0.012411232952897954,
+          "abs_err": 0.027589,
+          "rel_err": 0.689719,
+          "degraded": true
+        },
+        "beta_monthly_charges": {
+          "truth": 0.012,
+          "estimate": 0.0049970782881061035,
+          "abs_err": 0.007003,
+          "rel_err": 0.583577,
+          "degraded": false
+        },
+        "beta_support_tickets": {
+          "truth": 0.35,
+          "estimate": 0.4461592672089723,
+          "abs_err": 0.096159,
+          "rel_err": 0.274741,
+          "degraded": false
+        },
+        "beta_contract_one_year": {
+          "truth": -0.8,
+          "estimate": -0.21384102352768244,
+          "abs_err": 0.586159,
+          "rel_err": 0.732699,
+          "degraded": true
+        },
+        "beta_contract_two_year": {
+          "truth": -1.6,
+          "estimate": -0.28692700531573173,
+          "abs_err": 1.313073,
+          "rel_err": 0.820671,
+          "degraded": true
+        },
+        "prevalence": {
+          "truth": 0.3885841342018384,
+          "estimate": 0.37133333333333335,
+          "abs_err": 0.017251,
+          "rel_err": 0.044394,
+          "degraded": false
+        }
+      }
+    },
+    {
+      "round": 30,
+      "stone": "unit_mix",
+      "character": "The Metric Martian",
+      "dose": {
+        "frac": 0.2,
+        "factor": 100,
+        "col": "monthly_charges"
+      },
+      "stage": "train",
+      "class": "caught",
+      "worst_rel_err": 0.998846,
+      "checks_fired": [
+        "checks/scale_and_outliers.py"
+      ],
+      "time_impact": {
+        "prepare": 1.085,
+        "train": 1.008
+      },
+      "estimands": {
+        "beta_tenure_months": {
+          "truth": -0.04,
+          "estimate": -0.03261945903887008,
+          "abs_err": 0.007381,
+          "rel_err": 0.184514,
+          "degraded": false
+        },
+        "beta_monthly_charges": {
+          "truth": 0.012,
+          "estimate": 1.3852966050978673e-05,
+          "abs_err": 0.011986,
+          "rel_err": 0.998846,
+          "degraded": true
+        },
+        "beta_support_tickets": {
+          "truth": 0.35,
+          "estimate": 0.39258702603058937,
+          "abs_err": 0.042587,
+          "rel_err": 0.121677,
+          "degraded": false
+        },
+        "beta_contract_one_year": {
+          "truth": -0.8,
+          "estimate": -0.7944493918666362,
+          "abs_err": 0.005551,
+          "rel_err": 0.006938,
+          "degraded": false
+        },
+        "beta_contract_two_year": {
+          "truth": -1.6,
+          "estimate": -1.409051768196653,
+          "abs_err": 0.190948,
+          "rel_err": 0.119343,
           "degraded": false
         },
         "prevalence": {
@@ -1315,8 +1960,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.91,
-            "train": 1.048
+            "prepare": 0.901,
+            "train": 0.905
           }
         },
         {
@@ -1355,8 +2000,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.072,
-            "train": 1.228
+            "prepare": 0.911,
+            "train": 1.193
           }
         },
         {
@@ -1395,8 +2040,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.912,
-            "train": 1.266
+            "prepare": 0.884,
+            "train": 1.074
           }
         },
         {
@@ -1435,8 +2080,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.952,
-            "train": 1.323
+            "prepare": 1.162,
+            "train": 1.096
           }
         },
         {
@@ -1475,8 +2120,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.126,
-            "train": 1.024
+            "prepare": 1.102,
+            "train": 1.087
           }
         },
         {
@@ -1515,8 +2160,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.919,
-            "train": 1.246
+            "prepare": 1.094,
+            "train": 1.024
           }
         }
       ],
@@ -1569,8 +2214,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.135,
-            "train": 1.078
+            "prepare": 1.085,
+            "train": 1.159
           }
         },
         {
@@ -1609,8 +2254,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.941,
-            "train": 1.295
+            "prepare": 1.081,
+            "train": 1.04
           }
         },
         {
@@ -1649,8 +2294,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.943,
-            "train": 1.361
+            "prepare": 1.53,
+            "train": 1.261
           }
         },
         {
@@ -1689,8 +2334,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.984,
-            "train": 1.14
+            "prepare": 1.176,
+            "train": 1.386
           }
         },
         {
@@ -1729,8 +2374,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.948,
-            "train": 1.121
+            "prepare": 1.022,
+            "train": 1.013
           }
         },
         {
@@ -1769,8 +2414,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.161,
-            "train": 1.166
+            "prepare": 0.972,
+            "train": 0.985
           }
         }
       ],
@@ -1822,8 +2467,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.121,
-            "train": 1.241
+            "prepare": 0.885,
+            "train": 1.091
           }
         },
         {
@@ -1861,8 +2506,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.953,
-            "train": 1.278
+            "prepare": 0.88,
+            "train": 0.948
           }
         },
         {
@@ -1900,8 +2545,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.139,
-            "train": 1.289
+            "prepare": 0.935,
+            "train": 0.916
           }
         },
         {
@@ -1939,8 +2584,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.907,
-            "train": 1.044
+            "prepare": 1.122,
+            "train": 1.077
           }
         },
         {
@@ -1978,8 +2623,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.914,
-            "train": 1.043
+            "prepare": 1.03,
+            "train": 1.074
           }
         },
         {
@@ -2017,8 +2662,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.063,
-            "train": 1.274
+            "prepare": 1.093,
+            "train": 1.092
           }
         }
       ],
@@ -2070,8 +2715,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.123,
-            "train": 1.046
+            "prepare": 1.176,
+            "train": 1.181
           }
         },
         {
@@ -2110,8 +2755,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.942,
-            "train": 1.036
+            "prepare": 1.115,
+            "train": 1.078
           }
         },
         {
@@ -2150,8 +2795,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.926,
-            "train": 1.246
+            "prepare": 1.052,
+            "train": 1.093
           }
         },
         {
@@ -2190,8 +2835,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.145,
-            "train": 1.052
+            "prepare": 0.873,
+            "train": 1.071
           }
         },
         {
@@ -2230,8 +2875,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.063,
-            "train": 1.071
+            "prepare": 0.884,
+            "train": 0.883
           }
         },
         {
@@ -2270,8 +2915,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.088,
-            "train": 1.255
+            "prepare": 1.087,
+            "train": 0.904
           }
         }
       ],
@@ -2325,8 +2970,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.135,
-            "train": 1.266
+            "prepare": 0.904,
+            "train": 1.104
           }
         },
         {
@@ -2366,8 +3011,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.153,
-            "train": 1.06
+            "prepare": 0.869,
+            "train": 0.904
           }
         },
         {
@@ -2407,8 +3052,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.918,
-            "train": 1.049
+            "prepare": 0.862,
+            "train": 0.874
           }
         },
         {
@@ -2448,8 +3093,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.955,
-            "train": 1.269
+            "prepare": 1.09,
+            "train": 0.882
           }
         },
         {
@@ -2489,8 +3134,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.911,
-            "train": 1.251
+            "prepare": 0.884,
+            "train": 1.074
           }
         },
         {
@@ -2530,8 +3175,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.161,
-            "train": 1.295
+            "prepare": 1.039,
+            "train": 0.909
           }
         }
       ],
@@ -2584,8 +3229,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.144,
-            "train": 1.263
+            "prepare": 0.875,
+            "train": 1.148
           }
         },
         {
@@ -2623,8 +3268,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.194,
-            "train": 1.033
+            "prepare": 0.981,
+            "train": 1.078
           }
         },
         {
@@ -2662,8 +3307,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.081,
-            "train": 1.06
+            "prepare": 1.09,
+            "train": 0.894
           }
         },
         {
@@ -2701,8 +3346,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.102,
-            "train": 1.044
+            "prepare": 0.9,
+            "train": 0.89
           }
         },
         {
@@ -2740,8 +3385,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.923,
-            "train": 1.283
+            "prepare": 0.909,
+            "train": 0.937
           }
         },
         {
@@ -2779,8 +3424,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.915,
-            "train": 1.297
+            "prepare": 1.148,
+            "train": 1.004
           }
         }
       ],
@@ -2832,8 +3477,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.104,
-            "train": 1.33
+            "prepare": 0.855,
+            "train": 0.919
           }
         },
         {
@@ -2872,8 +3517,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.917,
-            "train": 1.067
+            "prepare": 0.876,
+            "train": 1.126
           }
         },
         {
@@ -2912,8 +3557,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.1,
-            "train": 1.323
+            "prepare": 0.892,
+            "train": 0.938
           }
         },
         {
@@ -2952,8 +3597,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.144,
-            "train": 1.099
+            "prepare": 1.041,
+            "train": 1.107
           }
         },
         {
@@ -2992,8 +3637,8 @@
             }
           },
           "time_impact": {
-            "prepare": 1.069,
-            "train": 1.123
+            "prepare": 0.89,
+            "train": 1.158
           }
         },
         {
@@ -3032,8 +3677,8 @@
             }
           },
           "time_impact": {
-            "prepare": 0.922,
-            "train": 1.494
+            "prepare": 1.045,
+            "train": 1.274
           }
         }
       ],
@@ -3055,50 +3700,48 @@
     ],
     "stages": {
       "prepare": {
-        "model": "const",
-        "seconds": 0.27,
+        "model": "linear",
+        "seconds": 5.28,
         "seconds_range": [
-          0,
-          2.06
+          2.11,
+          8.46
         ],
         "measured": {
-          "1500": 0.2427,
-          "4500": 0.268,
-          "15000": 0.2633
+          "1500": 0.2184,
+          "4500": 0.2589,
+          "15000": 0.2628
         },
-        "peak_mem_mb": 1220.8,
+        "peak_mem_mb": 1206.1,
         "mem_model": "linear",
         "superlinear": false,
         "flags": []
       },
       "train": {
-        "model": "quadratic",
-        "seconds": 1414.92,
+        "model": "linear",
+        "seconds": 20.02,
         "seconds_range": [
-          990.44,
-          1839.4
+          12.08,
+          27.95
         ],
         "measured": {
-          "1500": 0.5702,
-          "4500": 0.5066,
-          "15000": 0.6184
+          "1500": 0.501,
+          "4500": 0.6125,
+          "15000": 0.6583
         },
-        "peak_mem_mb": 553.4,
+        "peak_mem_mb": 580.1,
         "mem_model": "linear",
-        "superlinear": true,
-        "flags": [
-          "quadratic: 133x more rows -> ~17778x slower"
-        ]
+        "superlinear": false,
+        "flags": []
       }
     },
     "low_confidence": false,
-    "total_seconds": 1415.19,
+    "total_seconds": 25.3,
     "total_range": [
-      990.44,
-      1841.46
+      14.19,
+      36.41
     ],
     "checkpoint_before": "train",
-    "checkpoint_reason": "train is 100% of predicted runtime; a cheap check before it saves the most time"
+    "checkpoint_reason": "train is 79% of predicted runtime; a cheap check before it saves the most time"
   },
   "truth": {
     "beta_tenure_months": -0.04,
@@ -3114,12 +3757,12 @@
   },
   "baseline": {
     "prepare": {
-      "seconds": 0.253,
-      "peak_mem_mb": 68.3
+      "seconds": 0.2689,
+      "peak_mem_mb": 68.6
     },
     "train": {
-      "seconds": 0.4946,
-      "peak_mem_mb": 126.9
+      "seconds": 0.5885,
+      "peak_mem_mb": 126.6
     }
   },
   "antibodies": [
