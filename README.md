@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/icon/skilljab-mascot-v1.jpeg" alt="SkillJab mascot — a winking syringe with a boxing glove, jabbing a bar chart" width="260">
+  <img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/icon/skilljab-mascot-v1.jpeg" alt="SkillJab mascot — a winking syringe with a boxing glove, jabbing a bar chart" width="260">
 </p>
 
 <h1 align="center">SkillJab</h1>
@@ -7,7 +7,7 @@
 <p align="center"><b>Immunize an analysis by sabotaging it before it sees real data — and keep the antibodies as a skill.</b></p>
 
 <p align="center">
-  <code>pip install skilljab</code> · Claude Code plugin · Python 3.10+ · MIT
+  <code>pipx install skilljab</code> · Claude Code plugin · Python 3.10+ · MIT
 </p>
 
 ---
@@ -77,13 +77,25 @@ Elicitation proposes; simulation disposes. Nothing reaches the skill without a s
 
 ## Install
 
-```bash
-pip install skilljab                    # the engine (numpy, pandas, pyyaml)
-# from a checkout:
-pip install -e .
+SkillJab is a command-line tool, so install it with **pipx** (isolated, on your PATH, no fight with your system Python — on Debian/Ubuntu plain `pip install` is blocked by PEP 668):
 
-# the Claude Code plugin — point Claude at the plugin dir, e.g.
-claude --plugin-dir ./plugin            # or add it to a marketplace of your own
+```bash
+# from PyPI (once published)
+pipx install skilljab
+
+# from GitHub, before/without PyPI
+pipx install git+https://github.com/AlsammanAlsamman/skilljab.git
+
+# from a local checkout (add -e to develop against it)
+pipx install .
+```
+
+No pipx? `sudo apt install pipx && pipx ensurepath` (Debian/Ubuntu), `brew install pipx` (macOS), or use a venv: `python3 -m venv ~/.skilljab && ~/.skilljab/bin/pip install skilljab`.
+
+Then the Claude Code plugin — point Claude at the plugin directory:
+
+```bash
+claude --plugin-dir /path/to/skilljab/plugin      # this session only
 ```
 
 Requires Python ≥ 3.10. `/usr/bin/time` (GNU time) is used for per-stage peak memory when present; otherwise a coarser fallback.
@@ -180,11 +192,19 @@ Per pipeline, in *your* repo:
 ## Development
 
 ```bash
+python3 -m venv .venv && . .venv/bin/activate
 pip install -e ".[dev]"
 python -m pytest -q                      # 47 tests, ~35 s
 claude plugin validate plugin --strict
 python scripts/export_session.py         # save the current Claude Code session into docs/sessions/
+
+pipx run build && pipx run twine check dist/*     # build + verify the wheel and sdist
+pipx run twine upload dist/*                      # publish to PyPI (needs an API token)
 ```
+
+## Author
+
+**Alsamman M. Alsamman** — aalsamman100@gmail.com · [github.com/AlsammanAlsamman](https://github.com/AlsammanAlsamman)
 
 ## Why the name
 

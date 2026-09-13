@@ -9,8 +9,20 @@ description = "Immunize an analysis by sabotaging it before it sees real data - 
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
-authors = [{name = "Samman Mahmoud"}]
+authors = [{name = "Alsamman M. Alsamman", email = "aalsamman100@gmail.com"}]
+keywords = ["data-analysis", "simulation", "chaos-engineering", "statistics", "pipelines", "claude-code", "skills"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering",
+]
 dependencies = ["numpy>=1.24", "pandas>=2.0", "pyyaml>=6.0"]
+
+[project.urls]
+Homepage = "https://github.com/AlsammanAlsamman/skilljab"
+Repository = "https://github.com/AlsammanAlsamman/skilljab"
 
 [project.optional-dependencies]
 dev = ["pytest>=7"]
