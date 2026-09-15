@@ -1,0 +1,19 @@
+{
+  "title": "Target leakage: a revenue-derived column left in the predictors",
+  "stage": "prepare",
+  "node": null,
+  "trigger": "A numeric column other than revenue is almost a copy of revenue (e.g. an ad-platform 'attributed_revenue' or 'last_click_revenue' export field), so it dominates the fit and crushes every real channel coefficient toward zero.",
+  "headsup": "Before trusting the channel ROI numbers, make sure no column in the prepared data is secretly derived from revenue itself (platform exports sometimes bundle an 'attributed revenue', 'last-click revenue', or 'predicted revenue' field alongside the real outcome). If one slips in, the model will look like it fits great (high R2) while every channel's estimated return collapses toward zero -- the opposite of a broken pipeline, so it is easy to miss. UPDATED (round 19): a noisier leaked column (last_click_revenue, corr 0.78 with revenue) slipped past the original 0.9 correlation threshold, so the check's threshold was lowered to 0.75 -- checked against the correlation of every legitimate channel across 27 rounds (ceiling 0.64), so this stays safely clear of real channels.",
+  "mitigation": "Drop any column that is a near-duplicate or platform-computed version of the outcome before fitting; only keep genuine input/spend columns as predictors.",
+  "check": {
+    "stage": "prepare",
+    "script": "checks/no_target_leakage.py"
+  },
+  "evidence": "simulated",
+  "provenance": {
+    "round": 1,
+    "stone": "target_leakage",
+    "trick": "stone",
+    "worst_rel_err": 0.812718
+  }
+}

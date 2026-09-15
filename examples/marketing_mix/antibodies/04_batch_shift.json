@@ -1,0 +1,28 @@
+{
+  "title": "An unlogged export/format change shifts one channel's baseline (undetectable from this data alone)",
+  "stage": "prepare",
+  "node": null,
+  "trigger": "A batch of weeks (not tied to region, quarter, or row order) has a systematically higher/lower value for ANY channel column than the rest -- e.g. a media platform switching from net-of-fees to gross billed spend partway through the export, a discount-policy/pricing-system change applied to some weeks but not others, or a currency/tax adjustment applied to some rows but not others.",
+  "headsup": "There is currently no way to detect this from the data the pipeline receives: we tested a magnitude-ratio scan, skewness/kurtosis, grouping by region/quarter/row-order, and a 1-vs-2-component Gaussian-mixture fit on the affected column, and none of them separated the shifted rows from ordinary sampling noise, because the shift is spread across a large minority of rows and is small relative to that channel's natural spread. Confirmed twice now on two different columns (search_spend in round 5, discount_pct in round 27) -- this is a general property of the stone, not a quirk of one channel, so treat ANY channel's coefficient as potentially exposed to it. If a channel's estimated return per dollar looks off versus prior quarters with no other check firing, this silent batch/export shift is a real possibility -- ask the data source whether a reporting definition or platform changed mid-period. Detecting it would need an explicit batch id, data-source flag, export-version tag, or per-row ingestion timestamp added to the feed.",
+  "mitigation": "Add a batch/source/ingestion-date column to the export so shifts like this become checkable; in the meantime, cross-check channel spend/discount totals against the platform's or finance system's own record when a coefficient moves unexpectedly quarter over quarter.",
+  "evidence": "simulated",
+  "provenance": {
+    "round": 5,
+    "stone": "batch_shift",
+    "trick": "stone",
+    "worst_rel_err": 0.777076
+  },
+  "confirmed_also_silent_on": [
+    {
+      "round": 14,
+      "col": "search_spend",
+      "note": "repeat of round 5's stone in second pass, still silent as declared"
+    },
+    {
+      "round": 27,
+      "col": "discount_pct",
+      "worst_rel_err": 1.702993,
+      "note": "same undetectable signature confirmed on a different channel"
+    }
+  ]
+}

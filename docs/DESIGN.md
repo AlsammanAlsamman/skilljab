@@ -1,12 +1,24 @@
 # SkillJab — design notes
 
-*Status: **v0.1.0 built and tested** (2026-09-13) — engine, plugin, example, 47 tests. See README.md for usage; this file keeps the reasoning. Distilled from the 2026-09-13 brainstorm — full transcript in `sessions/2026-09-13-skillaid-brainstorm.md` (working name was SkillAid for most of the session). Re-export a session with `scripts/export_session.py`.*
+*Status: **v0.1.2 built and tested** (2026-09-13; live explainer test and second example 2026-09-15) — engine, plugin, two examples, 47 tests. See README.md for usage; this file keeps the reasoning. Distilled from the 2026-09-13 brainstorm — full transcript in `sessions/2026-09-13-skillaid-brainstorm.md` (working name was SkillAid for most of the session). Re-export a session with `scripts/export_session.py`.*
 
 ## One-line pitch
 
 **Immunize an analysis by sabotaging it before it sees real data — and keep the antibodies as a skill.**
 
-SkillJab makes the AI *prove* an analysis pipeline can recover a planted truth on a miniature dataset, then attacks that miniature with "stones" (controlled perturbations). Every silent failure — the result degrades and no check fires — forces the AI to explain why, which wakes up domain knowledge it had but wasn't applying (the HLA moment), and crystallizes it into a checker + mitigation + heads-up inside a persistent `SKILL.md`. The skill is the accumulated antibodies.
+SkillJab makes the AI *prove* an analysis pipeline can recover a planted truth on a miniature dataset, then attacks that miniature with "stones" (controlled perturbations). Every silent failure — the result degrades and no check fires — forces the AI to explain why, which wakes up domain knowledge it had but wasn't applying (the "oh — I should have told you" moment), and crystallizes it into a checker + mitigation + heads-up inside a persistent `SKILL.md`. The skill is the accumulated antibodies.
+
+## Scope — domain-general, by design (important)
+
+**SkillJab is not a bioinformatics or GWAS tool.** It is for *anyone who does a quantitative analysis with an AI at their side* — marketing and business analytics, finance, operations, A/B testing, forecasting, epidemiology, social science, machine learning, and yes, genomics — any analysis that ends in a number a truth can be planted for.
+
+The HLA/GWAS story below is the **origin anecdote**, the scar that made the author see the pattern; it is *one example* of the problem, not the target. Every design choice keeps it that way:
+
+- The **stones are domain-neutral** (a leaked column, a hidden batch, two units in one column, missing-not-at-random…). The AI's own knowledge does the specialization — the same `batch_shift` stone becomes "a genotyping plate" for a geneticist and "an unlabelled acquisition channel" for a marketer.
+- The **generators, symptom grammar, personas and seed graveyard** are mixed-domain on purpose (business, ML, epidemiology, forecasting, genomics).
+- The **shipped examples** are deliberately far from biology: a churn model and a marketing-mix ROI regression — the everyday questions people hand to an AI.
+
+Rule for anyone extending this project (including future AI sessions): never frame the roadmap, the examples, or "the next test" as bio-first. If a genomics example is added, add one from another field beside it.
 
 ## Audience
 
@@ -16,7 +28,9 @@ Later, maybe: other quantitative fields. **Not** judgment domains (design, strat
 
 ## Origin story (why this exists)
 
-In genomics, the HLA/MHC region (chr6:25–35Mb) has dense long-range LD that breaks PCA, LD pruning, PRS, fine-mapping. The knowledge is public and old (Price et al. 2008). Users still get burned after hours of compute because nobody told them *at the moment they wrote that step*. AI assistants make it worse: they write clean, competent, wrong code. The problem is timing, not knowledge.
+The author's own scar, from genomics: the HLA/MHC region (chr6:25–35Mb) has dense long-range LD that breaks PCA, LD pruning, PRS, fine-mapping. The knowledge is public and old (Price et al. 2008). Users still get burned after hours of compute because nobody told them *at the moment they wrote that step*. AI assistants make it worse: they write clean, competent, wrong code. The problem is timing, not knowledge.
+
+The same shape exists in every field: the `churn_score` column computed from the outcome, the region that reports spend in thousands, the join that doubled half the rows, the agency that never reports its biggest weeks. This is an example, not the scope (see above).
 
 ## Core mechanisms
 
@@ -25,7 +39,7 @@ In genomics, the HLA/MHC region (chr6:25–35Mb) has dense long-range LD that br
 3. **Miniature end-to-end run.** Whole pipeline including the final plot, on a subset. Checkers built at every stage boundary.
 4. **Stones in the pipe (chaos / mutation testing for the science).** Inject generic perturbations into the miniature: correlated block, missing-not-at-random, duplicates, outliers, distribution shift, label noise, time leakage, class imbalance, mixed date formats, silently changed units, heavy tails, non-stationarity, rare category level. Half from a catalog matched to the data type, half random-dosed (unknown unknowns).
 5. **Silent failures only.** A stone the pipeline handles is a pass. A stone that degrades the result with no checker firing is what gets reported. This keeps the output short enough to be read.
-6. **Wake-up.** For each silent failure the AI must explain it. Generic stone → latent domain knowledge → "this is the HLA region; exclude chr6:25–35Mb before PCA."
+6. **Wake-up.** For each silent failure the AI must explain it. Generic stone → latent domain knowledge → "this is the HLA region; exclude chr6:25–35Mb before PCA" / "this is the attribution tool's column; it is computed from revenue" / "this region reports spend in thousands".
 7. **Antibodies.** Each explanation becomes: a checker script, a mitigation, a heads-up in `SKILL.md`, an entry in the history. Re-test until the round is clean; bump the skill version.
 8. **Blind saboteur / analyst.** Separate contexts (Claude Code subagents). The saboteur writes `stones.json`; the engine applies it; the analyst only sees the perturbed data. The engine, not either agent, does the comparison. Otherwise the AI "knows" the stone and trivially handles it.
 
@@ -70,7 +84,7 @@ Not "all stones at every stage." Techniques at decreasing width:
 
 Search wide and cheap, prove narrow and expensive. Elicitation aims the saboteur; simulation is the only thing allowed to write antibodies.
 
-**Open question — seeding déjà vu before any user has a `history/`:** (a) hand-seed a small graveyard from the author's own scars (GWAS / data mining), (b) let the AI synthesize past cases (weak, immediate), (c) skip in v1 and grow from real runs. Leaning (a) + (c).
+**Open question — seeding déjà vu before any user has a `history/`:** (a) hand-seed a small graveyard from the author's own scars (data mining, business analytics, genomics — mixed on purpose), (b) let the AI synthesize past cases (weak, immediate), (c) skip in v1 and grow from real runs. Leaning (a) + (c).
 
 ## Architecture (refined 2026-09-13 — built as described; deviations noted below)
 
@@ -200,6 +214,20 @@ skilljab/
 `examples/churn_ai_pipeline/`: the pipeline Claude writes for "build a churn model, which factors matter" (dropna → get_dummies → logistic regression on everything). Clean recovery passes (AUC 0.73). Ten stones, one per round: **8 silent failures** (leak, numeric-as-text one-hot explosion, MNAR on support tickets, cents/dollars, hidden batch, outliers, collinear copies, noisy tenure); 2 harmless (duplicates, rare level). Six antibody checkers written; re-test: 6 caught, 2 remain silent by nature (hidden batch, measurement error) — the skill says which columns to ask for. Engine changes this forced: named features + categorical effects in the simulator, checkers receive the stage input as argv[2], outcome-aware stones, batch_shift preserves prevalence on binary outcomes, type_corruption copy bug, absolute tolerance is a floor (spec must set it below the smallest coefficient), sweep "knee" = first degradation (silent_from separately), shared checkers deduped. Replay: `run_demo.sh` (~4 min). Report + skill copies in `docs/demo/churn/`.
 
 **Hold-out (rounds 21–30, same day):** ten perturbations the checkers were never written for. First pass: 5 caught, 1 false alarm, 2 silent (a *very noisy* leak — leak threshold corr>0.9/AUC>0.95 too strict; cents/dollars introduced between stages — no guard at `train`), 2 engine crashes (stones on int64 columns). Fixes: leak check AUC>0.8 (clean features top out ~0.63, a model-wrecking leak sits ~0.89); antibody checks may declare `stages: [prepare, train]`; checkers tolerate a JSON stage output; five stones promote int columns to float. Second pass: 6 caught, 3 false alarm (check fired on a genuinely bad column, estimates survived that seed), 1 silent (the declared-unguardable batch). This is the evidence that antibodies generalize beyond the stone they were written for — and that the loop finds holes in its own defenses.
+
+### The live explainer test — marketing mix (2026-09-15)
+Until this date the central claim — *a silent failure makes the AI recall domain knowledge it wasn't applying, and write a working antibody* — had only been exercised with the author writing the antibodies, knowing what was planted. `examples/marketing_mix/` closes that gap in a second domain (weekly marketing spend → return per dollar; `dropna → get_dummies → OLS`):
+
+- **Setup.** Nine stones by hand (the saboteur was not under test), engine-graded: 6 silent, 3 harmless. Then a **fresh explainer agent** — no access to the design discussion, the churn antibodies, or this repo; only `plugin/agents/explainer.md`, an isolated copy of the pipeline, and the round numbers — required to write its wake-up sentences *before* reading each stone's hint and to log them verbatim (`examples/marketing_mix/EXPLAINER_LOG.md`).
+- **Wake-up: 6 of 6.** Before any hint it named the real mechanism each time: the attribution tool's revenue column, one region reporting spend in dollars instead of $k, a refund reversal in a week's revenue, Google Ads switching net-to-gross billing, `'10%'`/locale commas in a numeric field, ESP rounding → attenuation. The elicitation claim holds, at least for a tabular business analysis.
+- **Antibodies: 5 checkers + 1 honest refusal.** Each checker tested against the round and the clean baseline before being added. For the hidden batch it tried four detection methods, found none that beat sampling noise, and declared the failure unguardable — naming the column the feed would need. Re-test: 5 caught, 1 silent as declared.
+- **Hold-out 1 (9 unseen perturbations): first pass 2 caught / 6 silent.** The first-pass checkers were narrow: leak threshold 0.9, outlier scan on the outcome only, an integer check bound to one column, everything registered at `prepare` only. Sent back once with the verdicts (the `improve` flow), it measured the legitimate-correlation ceiling across all rounds and set the threshold at 0.75, generalized the outlier scan to every column, found the **checkpoint timing gap** (a stone landing after `prepare` is invisible to a `prepare` checker) and registered `unit_mix.py` at both stages, wrote an observable-footprint MNAR test that ignores the harmless missingness, and generalized "counts are integers" into "spend cannot be negative". Hold-out 1 again: 7 caught, 1 harmless, 1 declared.
+- **Hold-out 2 (6 perturbations neither pass saw): 3 caught, 1 false alarm, 2 silent.** The misses are specific: the timing lesson was applied to one checker and *not generalized* to the others (`outlier_spike.py` still runs at `prepare` only), and a 1.2-sd leak sits below any threshold that stays clear of real columns. One hold-out-2 result (heavy tails) flips between caught and silent with the round seed — near-tolerance stones need sweeps, not single rounds.
+- **Engine change this forced:** `tabular_regression` honours `truth.outcome` (named outcome column); `revenue`/`sales`/`conversions` recognised as outcome names by the stones.
+
+What it does *not* show: the saboteur and analyst live; a real unplanted dataset. One checker (`email_sends_not_integer.py`) detects the simulation's fingerprint rather than the field's failure — a known weakness of the explainer worth a rule in `explainer.md` ("a checker must describe a property of real data, not of the stone").
+
+**Design consequences.** (1) The `improve` loop's "send the explainer back once" is load-bearing — the first pass is reliably narrow. (2) `explainer.md` should tell the explainer, when a checker is widened for a stage, to review every other checker's stage registration too. (3) Hold-outs belong in the plugin flow: `/skilljab:jab` should end with a round of stones the explainer was not shown, not only the re-test.
 
 ### Open (deliberately)
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 import numpy as np, pandas as pd
 
-OUTCOME_NAMES = ("y", "outcome", "target", "label", "churned", "churn", "response", "converted", "event")
+OUTCOME_NAMES = ("y", "outcome", "target", "label", "churned", "churn", "response", "converted", "event", "revenue", "sales", "conversions")
 
 def outcome_col(df, col=None):
     if col in df.columns: return col

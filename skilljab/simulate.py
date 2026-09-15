@@ -51,6 +51,7 @@ def tabular_regression(rng, n, spec):
     for col, b in effects.items():
         y = y + float(b) * df[col].to_numpy()
     df["y"] = y
+    if t.get("outcome"): df = df.rename(columns={"y": t["outcome"]})
     return df, {f"beta_{c}": float(b) for c, b in effects.items()}
 
 @generator("tabular_classification")

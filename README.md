@@ -36,6 +36,7 @@
 
 **SkillJab** is a Claude Code plugin and CLI for people who do data analysis with an AI at their side. It builds a *miniature* of your analysis with a **planted truth**, sabotages it with realistic perturbations, and shows you the failures **nothing would have warned you about** — then turns every one of them into a checker, a fix, and a heads-up inside a `SKILL.md` that Claude loads whenever it touches that analysis again.
 
+- 🌍 **Any quantitative analysis** — marketing, finance, operations, A/B tests, forecasting, epidemiology, ML, genomics. If it ends in a number, a truth can be planted for it
 - 🧪 **Proves** your pipeline can recover a truth you planted — before any real data
 - 🥊 **Finds the silent failures** — the result moved and no check fired
 - 🧬 **Keeps the antibodies** — your AI gets better at *your* pipeline, permanently, with the reason on record
@@ -75,11 +76,53 @@ Then SkillJab threw ten stones at it, one per round, each a thing that happens t
   <a href="docs/demo/churn/">the rendered report and the skill it produced →</a>
 </p>
 
+### Second test, second field — and the explainer ran blind
+
+> **The prompt:** *"Here's our weekly marketing data — TV, search, social, email spend, the discount, region, quarter, revenue. Which channels drive revenue and what's the return per dollar?"*
+
+Claude wrote `dropna` → `get_dummies` → linear regression, coefficient per channel = return per dollar. On clean data it recovers every planted return. Then nine stones, each a thing a real marketing table does — **six broke the answer with nothing firing**:
+
+| what a real marketing table does | what the AI's pipeline reported | warned? |
+|---|---|:---:|
+| the attribution tool's `attributed_revenue` column in the feed | R² *up* to 0.94; every channel's return cut 70–80% | ❌ |
+| one region reports TV spend in dollars, not $k | TV: $2.50 → $0.0004 — "TV does nothing" | ❌ |
+| a few Black-Friday-scale revenue weeks | four of five returns off; discount overstated 33% | ❌ |
+| a hidden market: pricier search *and* higher revenue, unlabelled | search: $4.00 → $7.11 — the budget moves to search | ❌ |
+| discount exported with stray whitespace | shredded into 576 dummy columns; discount coefficient `null` | ❌ |
+| email counts from a noisy ESP log | email's return 54% too small | ❌ |
+| agency never reports its biggest social weeks · spend+clicks+impressions · duplicated weeks | fine | harmless |
+
+<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/marketing_mix/01-headline-and-stars.png" alt="Report headline for the marketing-mix test: The Drifter (batch_shift) hit stage prepare — beta_discount_pct moved 170% from the planted truth and nothing warned you. 33 rounds, 11 silent. Stars: prepare 3, fit 2." width="880"></p>
+
+**This time nobody wrote the antibodies by hand.** A fresh explainer agent — no access to the design notes, the churn antibodies, or the stones' hints — had to name the real-world mechanism *before* being told what was planted. Six of six, verbatim from [its log](examples/marketing_mix/EXPLAINER_LOG.md):
+
+> *"an ad-platform export (Google/Meta attribution) tacks on an `attributed_revenue` field — really next week's outcome wearing a feature's clothes"* · *"a '$k' unit that someone forgot to normalize for one region"* · *"a refund reversal, a promo credit, or a duplicate transaction batch added into that week's revenue"* · *"Google Ads switching from net-of-fees to gross billed spend"* · *"someone typing '10%' instead of '10', a stray currency symbol, a locale using commas"* · *"an ESP rounding or batching send counts — classic errors-in-variables, attenuation on that channel only"*
+
+It wrote five checkers, tested each against the clean baseline, and for the hidden batch tried four detection methods, found none, and **declared it unguardable** — naming the column the feed would need.
+
+**Then the hold-outs — the part that makes it evidence.**
+
+| | caught | silent |
+|---|:---:|:---:|
+| same 9 stones, after its antibodies | 5 | 1 — the declared one |
+| hold-out 1: 9 perturbations it never saw, **first pass** | 2 | 6 — its checkers were narrow: a threshold too strict, an outlier scan on revenue only, everything at one checkpoint |
+| hold-out 1 again, after one `improve` round (sent back with only the verdicts) | 7 | 1 — the declared one; it found a **checkpoint timing gap** on its own |
+| hold-out 2: 6 perturbations neither pass saw | 3 | 2 (+1 false alarm) — the timing fix wasn't generalized to the other checkers |
+
+<p align="center"><img src="https://raw.githubusercontent.com/AlsammanAlsamman/skilljab/main/assets/report/marketing_mix/06-immunity-record.png" alt="Vaccination card for the marketing-mix test: 33 rounds by 10 stones; the red silent cells of rounds 1–9 turn green from round 10 on as the explainer's antibodies are added; hold-out 2 in rounds 28–33 shows the next holes; the hidden batch stays red." width="1000"></p>
+
+The immunity record is the whole story in one picture: red in the first nine rounds, green once the antibodies are in, red again in the last rounds where a fresh hold-out found the next holes — and the hidden batch red throughout, because the skill says it cannot be guarded with this data. (The replay installs the explainer's *final* antibodies; the first-pass 2-of-9 is in the log.)
+
+<p align="center">
+  <a href="examples/marketing_mix/"><b>The write-up, the verbatim explainer log, and the replay →</b></a> &nbsp;·&nbsp;
+  <a href="docs/demo/marketing_mix/">report and skill →</a>
+</p>
+
 <br>
 
 ## 💡 Why
 
-You ask Claude to write your pipeline. It writes clean, competent code. You run it on the real data, wait hours, and the result is wrong — because of something that was *known*: the region where every variant is correlated, the column secretly computed from the outcome, the join that doubled half the rows, the spreadsheet that exported `1,234` as text.
+You ask Claude to write your pipeline. It writes clean, competent code. You run it on the real data, wait hours, and the result is wrong — because of something that was *known*: the attribution column secretly computed from the revenue it "predicts", the region that reports spend in thousands, the join that doubled half the rows, the spreadsheet that exported `1,234` as text, the genome region where every variant is correlated.
 
 The AI knew about all of these. It didn't apply them, because nothing reminded it at the moment it was writing that step. You didn't catch it, because the code looked right. And by the time the mistake was visible, the compute was spent.
 
@@ -193,6 +236,18 @@ cat  .claude/skills/churn/SKILL.md
 </details>
 
 <details>
+<summary>Replay the marketing-mix test with the explainer's own antibodies (3.5 minutes)</summary>
+
+```bash
+cd skilljab/examples/marketing_mix
+./run_demo.sh                                         # baseline, 33 rounds, 6 sweeps, report
+open .claude/skills/marketing_mix/history/report.html
+cat  .claude/skills/marketing_mix/SKILL.md
+cat  EXPLAINER_LOG.md                                 # what the explainer said before it saw each hint
+```
+</details>
+
+<details>
 <summary>Drive the engine by hand on your own pipeline</summary>
 
 ```bash
@@ -281,14 +336,13 @@ Deliberately domain-neutral. A generic stone is enough to make the AI's own know
 
 ## 🔌 Your pipeline's contract
 
-Stages as shell commands — any language, any tool — and a last stage that writes the estimates:
+Stages as shell commands — any language, any tool, any field — and a last stage that writes the estimates:
 
 ```yaml
-name: gwas
+name: marketing_mix                                      # or a churn model, a forecast, a GWAS…
 stages:
-  - id: qc      cmd: "plink2 --bfile {in} --geno 0.02 --make-bed --out {out}"   out: qc.csv
-  - id: prune   cmd: "Rscript prune.R {in} {out}"                              out: pruned.csv
-  - id: fit     cmd: "python fit.py {in} {out}"                                 out: result.json
+  - id: prepare cmd: "python3 prepare.py {in} {out}"       out: prepared.csv
+  - id: fit     cmd: "Rscript fit.R {in} {out}"            out: result.json
 ```
 
 `result.json = {"estimates": {"beta_x1": 0.79, ...}}`, with the same names as the planted truth in `sim/spec.yaml`. Checkers are scripts called at stage boundaries — `python3 check.py <stage_output> <stage_input>` — that exit `1` or print `{"fired": true, "message": "..."}`.
@@ -301,7 +355,8 @@ Three generators ship: `tabular_regression`, `tabular_classification`, `two_grou
 
 - **Miniatures can lie.** Some failures only appear at scale. The timing page extrapolates and says so; treat ranges as optimistic.
 - **You need a truth to plant.** Quantitative analyses, yes. Design and strategy, no — there the simulation would just be the AI's own assumptions fed back to itself.
-- **Stones are stones.** The churn test proves the mechanism and its generalization; it has not yet caught a problem in a real dataset that nobody planted. That's the next test, and the one that matters most.
+- **Stones are stones.** Two tests (churn, marketing mix) prove the mechanism, that the antibodies generalize past the stones they were written for, and — live, with a blind explainer — that the wake-up is real. It has not yet caught a problem in a real dataset that nobody planted. That's the next test, and the one that matters most.
+- **Only the explainer has been tested live.** The saboteur and analyst roles have run through the engine but not as blind agents in a full `/skilljab:jab`. The explainer's first pass is reliably narrow (column-specific checkers, one checkpoint); the loop's re-test-and-send-back step is what makes it generalize.
 - **The graveyard is local.** A shared, anonymized graveyard of real past failures is the obvious next step.
 
 <details>
@@ -328,7 +383,7 @@ claude plugin validate plugin --strict
 ```
 skilljab/            engine: simulate · stones/ · inject · runner · check · project · plandiff · tree · lineup · timing · render_skill · graveyard · report · pack/
 plugin/              Claude Code plugin: commands/ · agents/ · skills/skilljab-core · hooks/
-examples/            churn_ai_pipeline — the test above, replayable · toy_regression — the minimal example the tests use
+examples/            churn_ai_pipeline · marketing_mix — the two tests above, replayable · toy_regression — the minimal example the tests use
 assets/flowchart/    the loop diagram — hand-drawn SVG in JavaScript, rendered to PNG by scripts/render_flowchart.sh
 docs/DESIGN.md       the design and the reasoning behind every choice
 docs/sessions/       transcripts of the design discussions

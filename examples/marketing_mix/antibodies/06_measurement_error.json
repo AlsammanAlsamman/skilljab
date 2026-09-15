@@ -1,0 +1,19 @@
+{
+  "title": "Fractional values in a send-count column signal injected measurement noise",
+  "stage": "prepare",
+  "node": null,
+  "trigger": "email_sends (a count of thousands of emails sent) arrives with non-integer values -- a sign that continuous noise (e.g. an ESP reconciling 'queued' vs 'sent' counts, or a re-estimated send figure) has been mixed into what should be an exact count.",
+  "headsup": "This is the quiet failure: nothing crashes and R2 barely moves, but the noised channel's estimated return per dollar is pulled toward zero (classic errors-in-variables attenuation) while every other channel still reports correctly, so the report looks trustworthy at a glance. A simple sanity check -- email_sends should always be a whole number -- catches it immediately.",
+  "mitigation": "Confirm the send-count source before fitting; if there is genuine platform-level uncertainty in the count, model it explicitly (e.g. errors-in-variables regression) rather than ignoring it.",
+  "check": {
+    "stage": "prepare",
+    "script": "checks/email_sends_not_integer.py"
+  },
+  "evidence": "simulated",
+  "provenance": {
+    "round": 9,
+    "stone": "measurement_error",
+    "trick": "stone",
+    "worst_rel_err": 0.542174
+  }
+}

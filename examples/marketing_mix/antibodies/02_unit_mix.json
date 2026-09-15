@@ -1,0 +1,22 @@
+{
+  "title": "Mixed units in a spend column (e.g. dollars vs thousands)",
+  "stage": "prepare",
+  "node": null,
+  "trigger": "A minority of rows in a spend column are ~1000x (or 10x) the rest, as if that subset was recorded in a different unit (raw dollars instead of $k, or similar), producing a bimodal magnitude split.",
+  "headsup": "Check that every spend column is in one consistent unit across all rows. A regional export or a week's batch sometimes reports the same field in a different unit (e.g. raw dollars instead of the usual $k), and a handful of those rows become huge-variance outliers. The regression will let those rows dominate, and the affected channel's estimated return-per-dollar comes back near zero and unreliable, even though every other channel still looks fine. UPDATED (round 25): the same corruption can be injected into the already-prepared table (after the `prepare` step's own check already ran clean), not just the raw export -- so the script now scans every file path it's given and is registered at both the `prepare` and `fit` checkpoints, catching the corruption whichever point it actually lands at.",
+  "mitigation": "Find the rows with implausibly large values for that column, confirm the unit with the data source, and rescale (or exclude) them before fitting.",
+  "check": {
+    "stages": [
+      "prepare",
+      "fit"
+    ],
+    "script": "checks/unit_mix.py"
+  },
+  "evidence": "simulated",
+  "provenance": {
+    "round": 2,
+    "stone": "unit_mix",
+    "trick": "stone",
+    "worst_rel_err": 0.999831
+  }
+}

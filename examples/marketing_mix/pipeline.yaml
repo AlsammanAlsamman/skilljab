@@ -1,0 +1,8 @@
+name: marketing_mix
+stages:
+  - id: prepare
+    cmd: "python3 {pipeline_dir}/prepare.py {in} {out}"
+    out: prepared.csv
+  - id: fit
+    cmd: "python3 {pipeline_dir}/fit.py {in} {out}"
+    out: result.json

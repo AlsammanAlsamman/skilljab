@@ -1,0 +1,19 @@
+{
+  "title": "A handful of implausible revenue weeks drag the whole model",
+  "stage": "prepare",
+  "node": null,
+  "trigger": "A small fraction of weeks have revenue OR any feature/spend column far outside the rest of the distribution (robust z-score using median/MAD far above normal), e.g. a refund reversal, duplicate transaction batch, promo-credit error, or a campaign budget-cap glitch/currency slip inflating that week's value.",
+  "headsup": "Scan revenue and every spend column for a handful of weeks that are wildly larger than the rest before trusting the coefficients. A least-squares fit cannot ignore even a few extreme weeks (about 3-4% here was enough); it lets them pull the intercept and several channel coefficients off target at once, in an uneven way that is easy to mistake for 'the model is just a bit noisy' rather than a data problem. UPDATED (round 21): the same spike stone can land on a feature column (social_spend) instead of revenue and pass through unnoticed if only revenue is scanned -- the script now checks every numeric feature column, not just the outcome.",
+  "mitigation": "Investigate the flagged weeks with the business (refunds, credits, duplicate postings, month-end corrections) and exclude or correct them before fitting; consider a robust regression if this is recurring.",
+  "check": {
+    "stage": "prepare",
+    "script": "checks/outlier_spike.py"
+  },
+  "evidence": "simulated",
+  "provenance": {
+    "round": 4,
+    "stone": "outliers",
+    "trick": "stone",
+    "worst_rel_err": 0.526043
+  }
+}

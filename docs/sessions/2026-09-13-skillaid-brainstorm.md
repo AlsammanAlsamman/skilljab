@@ -1810,3 +1810,129 @@ The cheapest way to close the first gap is a hold-out test: throw stones the che
 
 ---
 
+**Claude**
+
+Everything is regenerated and consistent. Where things stand:
+
+**The example now shows usefulness in three layers**
+1. **The problem is real** — the AI-written churn pipeline silently breaks under 8 of 10 realistic perturbations while reporting a clean AUC.
+2. **The loop closes** — antibodies turn 6 of those into catches; the 2 left are declared unguardable with the columns to ask for.
+3. **It generalizes (the hold-out)** — 10 perturbations the checkers were never written for: 9 flagged, 1 miss (the declared one). And the hold-out's first pass exposed two genuine holes in the antibodies, which the replay fixes in front of the reader. That last part is what makes it evidence rather than a demo tuned to itself.
+
+**Repo state**
+- `examples/churn_ai_pipeline/run_demo.sh` replays all 30 rounds + sweeps in ~4 min, ends `jabbed: true`; its README has the hold-out table.
+- `docs/demo/churn/` and `assets/report/churn/` regenerated from that replay (30 rounds in the immunity record now).
+- Main README: hold-out paragraph added to the churn section.
+- Engine fixes that fell out: five stones crashed on integer columns; checks can guard multiple stages (`stages: [...]`); checkers tolerate a JSON stage output. 47 tests pass, plugin validates.
+- Version bumped to **0.1.2 locally, not uploaded** — the int-column crash affects anyone with integer features, so it's worth releasing; say the word and I'll push it with the project token (or you run the three build/upload lines yourself).
+
+**What would settle the question completely:** one real dataset nobody planted anything in — the public IBM Telco churn CSV, or a GWAS you actually run. If SkillJab surfaces one true thing there, the example stops being a demonstration and becomes a case.
+
+---
+
+**User**
+
+make the readme more fancy and improve its structure
+
+---
+
+**Claude**
+
+README restructured. What changed:
+
+**Top of page**
+- Logo, name, one-line thesis, then a **badge row** (PyPI version, Python versions, "Claude Code plugin", "47 tests passing", MIT) — the badges pull live from shields.io once the package/repo are public.
+- Three-command strip: `pipx install skilljab` · `claude --plugin-dir` · `/skilljab:jab`.
+- **Section navigation** with anchor links.
+- One paragraph on what it is, then four one-line value props.
+
+**Sections, in reading order**
+1. 🎯 **See it work** — the churn test moved to the top: prompt → the 10-row table (now with a ❌/harmless column) → the report headline screenshot → antibodies → hold-out → links to the write-up and demo.
+2. 💡 **Why** — the problem, shorter; the name explanation folded in here.
+3. ⚙️ **How it works** — a **Mermaid flowchart** of the loop (plant → prove → stones → silent? → explain → antibody → SKILL.md → repeat), renders natively on GitHub; six numbered steps; a command table.
+4. 📊 **The report** — the five remaining screenshots in a **2×2 grid + one wide**, each with its caption beside it instead of stacked.
+5. 🚀 **Install** — main path in three lines; alternatives, the churn replay, and the manual CLI walkthrough tucked in collapsible `<details>` blocks so the page doesn't sprawl.
+6. 📦 **What you get** — the skill folder, plus a real heads-up quoted verbatim from the generated `SKILL.md` (verified against the file — it's `ab-004`).
+7. 🔬 **Under the hood** — engine/plugin table, the five blind roles, the funnel as a table.
+8. 🪨 **The stones** — with emoji characters.
+9. 🔌 Pipeline contract · ⚠️ **Limits** (now includes the honest "stones are stones — not yet a real unplanted dataset" line) · a collapsible **Roadmap** · 🛠️ Development · author line.
+
+Images and badges point at the GitHub raw URLs / shields.io, so the page fully lights up once you push to `AlsammanAlsamman/skilljab`. Tests still pass (47).
+
+---
+
+**User**
+
+make the flowchart you added in the readme better and fancier
+
+---
+
+**Claude**
+
+Done. The flowchart is now a styled top-down diagram, verified rendering in Chrome with the same Mermaid engine GitHub uses:
+
+- **Ten nodes, one path that matters.** Plan N ways → plant a truth → prove recovery → throw stones → the coral decision diamond *"result moved and no check fired?"* → **silent failure** (coral, heavy edge) → Explain → Antibody → `SKILL.md` → Run the real thing (amber). "No" branches off to a quiet green *pass — say nothing*.
+- **Color carries the story**: white boxes are the miniature, coral is the jab, navy is the immunity being built, amber is go. A dotted loop from `SKILL.md` back to the stones reads "next round, harder stones."
+- The stone characters (👻 🕰️ 🌊 👽) and the wake-up quote ("oh — this is the HLA region") are in the nodes themselves, so the diagram tells the story without the text around it.
+- ~890 px wide, so it fits GitHub's README column at full size with readable labels.
+
+The first attempt (three swim-lanes) looked good on paper but Mermaid ignores lane direction when edges cross lanes, and the longer labels clipped — I only caught that by rendering it, so the version in the README is the one I've actually seen.
+
+---
+
+**User**
+
+use javascript to make the flowchart fancier please andadd it png high resolution to the readme
+
+---
+
+**Claude**
+
+I'll hand-build the diagram as SVG with JavaScript (full control over layout, curves, and typography), render it in headless Chrome at 2× device scale, and embed the PNG.
+
+---
+
+**Claude**
+
+Clean at 2× — crisp type, no collisions. Done:
+
+- **`assets/flowchart/skilljab-loop.html`** — the diagram, drawn in JavaScript as SVG: three lanes (🧪 Miniature · 🥊 Jab · 🧬 Immunity), cards with drop shadows and accent strokes, a gradient coral decision diamond, the "silent failure" edge as the one thick coral path, a dashed "next round, harder stones" loop, an amber "run the real thing" pill, Inter from Google Fonts, and the closing caption *"Elicitation proposes; simulation disposes…"*.
+- **`assets/flowchart/skilljab-loop.png`** — **3120 × 1400**, rendered at 2× device scale in headless Chrome. Sharp on retina screens and when GitHub scales it to the README column.
+- **`scripts/render_flowchart.sh`** — re-renders the PNG from the HTML in one command, for when you change wording.
+- **README** — the Mermaid block is replaced by the PNG (width 1000, so it fills the column); the layout section mentions where the source lives.
+
+One thing I hit and fixed along the way, in case you re-render: headless Chrome's `--window-size` includes ~87 px of its own frame, so a 700-tall SVG was being cut at 613 — the script requests 900 and crops to the SVG.
+
+---
+
+**User**
+
+improve the icon in the readme  it should be circlized
+
+---
+
+**Claude**
+
+Done. The README hero is now `assets/icon/skilljab-icon-circle-512-ring.png` — a true circle with a thin navy ring, transparent outside, so it sits cleanly on GitHub's light or dark theme.
+
+How it was made (your updated art is already a blue disc with the glove overhanging the edge, which the first naive crop was cutting off):
+1. Flood-filled the *outer* white away from the corners only — the sticker's white outline stays.
+2. Seated the artwork on a slightly larger blue disc (10% margin), so the glove and the needle tip are fully inside.
+3. Circle-masked with a 4× supersampled edge; exported 512 / 256 / 128 / 64 and the ringed 512.
+
+The `skilljab-icon-circle-64.png` is the favicon-sized one, and it still reads as the mascot at that size. The older rounded-square set is left in place in case you want it for a store listing; delete `skilljab-icon-{512,256,128}.png` and `skilljab-favicon-64.png` if not.
+
+---
+
+**User**
+
+update the pip readme as well
+
+---
+
+**Claude**
+
+Updating the README on PyPI means a new release — the README is baked into the package at build time, and PyPI never lets a version be replaced. 0.1.2 is already bumped locally (it also carries the integer-column stone fix and multi-stage checks), so I'll build and upload it with the project token you gave earlier.
+
+---
+

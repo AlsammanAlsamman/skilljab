@@ -1,0 +1,188 @@
+{
+  "name": "marketing_mix",
+  "version": 1,
+  "description": "Marketing-mix ROI regression, jabbed: 6 silent failures found; 5 guarded by checks, 1 (a hidden batch) declared unguardable without a source/batch column.",
+  "pipeline": "/home/samman/Documents/MyGitHub/skilljab/examples/marketing_mix/pipeline.yaml",
+  "antibodies": [
+    {
+      "title": "Target leakage: a revenue-derived column left in the predictors",
+      "stage": "prepare",
+      "node": null,
+      "trigger": "A numeric column other than revenue is almost a copy of revenue (e.g. an ad-platform 'attributed_revenue' or 'last_click_revenue' export field), so it dominates the fit and crushes every real channel coefficient toward zero.",
+      "headsup": "Before trusting the channel ROI numbers, make sure no column in the prepared data is secretly derived from revenue itself (platform exports sometimes bundle an 'attributed revenue', 'last-click revenue', or 'predicted revenue' field alongside the real outcome). If one slips in, the model will look like it fits great (high R2) while every channel's estimated return collapses toward zero -- the opposite of a broken pipeline, so it is easy to miss. UPDATED (round 19): a noisier leaked column (last_click_revenue, corr 0.78 with revenue) slipped past the original 0.9 correlation threshold, so the check's threshold was lowered to 0.75 -- checked against the correlation of every legitimate channel across 27 rounds (ceiling 0.64), so this stays safely clear of real channels.",
+      "mitigation": "Drop any column that is a near-duplicate or platform-computed version of the outcome before fitting; only keep genuine input/spend columns as predictors.",
+      "check": {
+        "stage": "prepare",
+        "script": "checks/no_target_leakage.py"
+      },
+      "evidence": "simulated",
+      "provenance": {
+        "round": 1,
+        "stone": "target_leakage",
+        "trick": "stone",
+        "worst_rel_err": 0.812718
+      },
+      "id": "ab-001",
+      "added": "2026-09-15T03:29:29"
+    },
+    {
+      "title": "Mixed units in a spend column (e.g. dollars vs thousands)",
+      "stage": "prepare",
+      "node": null,
+      "trigger": "A minority of rows in a spend column are ~1000x (or 10x) the rest, as if that subset was recorded in a different unit (raw dollars instead of $k, or similar), producing a bimodal magnitude split.",
+      "headsup": "Check that every spend column is in one consistent unit across all rows. A regional export or a week's batch sometimes reports the same field in a different unit (e.g. raw dollars instead of the usual $k), and a handful of those rows become huge-variance outliers. The regression will let those rows dominate, and the affected channel's estimated return-per-dollar comes back near zero and unreliable, even though every other channel still looks fine. UPDATED (round 25): the same corruption can be injected into the already-prepared table (after the `prepare` step's own check already ran clean), not just the raw export -- so the script now scans every file path it's given and is registered at both the `prepare` and `fit` checkpoints, catching the corruption whichever point it actually lands at.",
+      "mitigation": "Find the rows with implausibly large values for that column, confirm the unit with the data source, and rescale (or exclude) them before fitting.",
+      "check": {
+        "stages": [
+          "prepare",
+          "fit"
+        ],
+        "script": "checks/unit_mix.py"
+      },
+      "evidence": "simulated",
+      "provenance": {
+        "round": 2,
+        "stone": "unit_mix",
+        "trick": "stone",
+        "worst_rel_err": 0.999831
+      },
+      "id": "ab-002",
+      "added": "2026-09-15T03:29:29"
+    },
+    {
+      "title": "A handful of implausible revenue weeks drag the whole model",
+      "stage": "prepare",
+      "node": null,
+      "trigger": "A small fraction of weeks have revenue OR any feature/spend column far outside the rest of the distribution (robust z-score using median/MAD far above normal), e.g. a refund reversal, duplicate transaction batch, promo-credit error, or a campaign budget-cap glitch/currency slip inflating that week's value.",
+      "headsup": "Scan revenue and every spend column for a handful of weeks that are wildly larger than the rest before trusting the coefficients. A least-squares fit cannot ignore even a few extreme weeks (about 3-4% here was enough); it lets them pull the intercept and several channel coefficients off target at once, in an uneven way that is easy to mistake for 'the model is just a bit noisy' rather than a data problem. UPDATED (round 21): the same spike stone can land on a feature column (social_spend) instead of revenue and pass through unnoticed if only revenue is scanned -- the script now checks every numeric feature column, not just the outcome.",
+      "mitigation": "Investigate the flagged weeks with the business (refunds, credits, duplicate postings, month-end corrections) and exclude or correct them before fitting; consider a robust regression if this is recurring.",
+      "check": {
+        "stage": "prepare",
+        "script": "checks/outlier_spike.py"
+      },
+      "evidence": "simulated",
+      "provenance": {
+        "round": 4,
+        "stone": "outliers",
+        "trick": "stone",
+        "worst_rel_err": 0.526043
+      },
+      "id": "ab-003",
+      "added": "2026-09-15T03:29:29"
+    },
+    {
+      "title": "An unlogged export/format change shifts one channel's baseline (undetectable from this data alone)",
+      "stage": "prepare",
+      "node": null,
+      "trigger": "A batch of weeks (not tied to region, quarter, or row order) has a systematically higher/lower value for ANY channel column than the rest -- e.g. a media platform switching from net-of-fees to gross billed spend partway through the export, a discount-policy/pricing-system change applied to some weeks but not others, or a currency/tax adjustment applied to some rows but not others.",
+      "headsup": "There is currently no way to detect this from the data the pipeline receives: we tested a magnitude-ratio scan, skewness/kurtosis, grouping by region/quarter/row-order, and a 1-vs-2-component Gaussian-mixture fit on the affected column, and none of them separated the shifted rows from ordinary sampling noise, because the shift is spread across a large minority of rows and is small relative to that channel's natural spread. Confirmed twice now on two different columns (search_spend in round 5, discount_pct in round 27) -- this is a general property of the stone, not a quirk of one channel, so treat ANY channel's coefficient as potentially exposed to it. If a channel's estimated return per dollar looks off versus prior quarters with no other check firing, this silent batch/export shift is a real possibility -- ask the data source whether a reporting definition or platform changed mid-period. Detecting it would need an explicit batch id, data-source flag, export-version tag, or per-row ingestion timestamp added to the feed.",
+      "mitigation": "Add a batch/source/ingestion-date column to the export so shifts like this become checkable; in the meantime, cross-check channel spend/discount totals against the platform's or finance system's own record when a coefficient moves unexpectedly quarter over quarter.",
+      "evidence": "simulated",
+      "provenance": {
+        "round": 5,
+        "stone": "batch_shift",
+        "trick": "stone",
+        "worst_rel_err": 0.777076
+      },
+      "confirmed_also_silent_on": [
+        {
+          "round": 14,
+          "col": "search_spend",
+          "note": "repeat of round 5's stone in second pass, still silent as declared"
+        },
+        {
+          "round": 27,
+          "col": "discount_pct",
+          "worst_rel_err": 1.702993,
+          "note": "same undetectable signature confirmed on a different channel"
+        }
+      ],
+      "id": "ab-004",
+      "added": "2026-09-15T03:29:30"
+    },
+    {
+      "title": "A numeric column gets mistaken for a category and shredded into hundreds of dummy columns",
+      "stage": "prepare",
+      "node": null,
+      "trigger": "A numeric column (e.g. discount_pct) has whitespace, non-breaking-space padding, or blank/sentinel entries from a spreadsheet export, making pandas read it as text; the pipeline's 'one-hot encode every text column' rule then explodes it into hundreds of near-duplicate dummy columns instead of keeping it as one number.",
+      "headsup": "That channel effectively vanishes from the model -- it is not just noisy, its coefficient is completely absent from the results (discount_pct came back as null here) -- while everything else in the report still looks normal, which makes this the easiest failure to miss. Check that every column you expect to be numeric actually loaded as a number, not text, before trusting the coefficient table, especially after any spreadsheet round-trip.",
+      "mitigation": "Strip whitespace/non-breaking spaces and coerce the column to numeric (pd.to_numeric with errors handled) before deciding which columns are categorical for one-hot encoding.",
+      "check": {
+        "stage": "prepare",
+        "script": "checks/numeric_column_exploded.py"
+      },
+      "evidence": "simulated",
+      "provenance": {
+        "round": 7,
+        "stone": "type_corruption",
+        "trick": "stone",
+        "worst_rel_err": 1.270768
+      },
+      "id": "ab-005",
+      "added": "2026-09-15T03:29:30"
+    },
+    {
+      "title": "Fractional values in a send-count column signal injected measurement noise",
+      "stage": "prepare",
+      "node": null,
+      "trigger": "email_sends (a count of thousands of emails sent) arrives with non-integer values -- a sign that continuous noise (e.g. an ESP reconciling 'queued' vs 'sent' counts, or a re-estimated send figure) has been mixed into what should be an exact count.",
+      "headsup": "This is the quiet failure: nothing crashes and R2 barely moves, but the noised channel's estimated return per dollar is pulled toward zero (classic errors-in-variables attenuation) while every other channel still reports correctly, so the report looks trustworthy at a glance. A simple sanity check -- email_sends should always be a whole number -- catches it immediately.",
+      "mitigation": "Confirm the send-count source before fitting; if there is genuine platform-level uncertainty in the count, model it explicitly (e.g. errors-in-variables regression) rather than ignoring it.",
+      "check": {
+        "stage": "prepare",
+        "script": "checks/email_sends_not_integer.py"
+      },
+      "evidence": "simulated",
+      "provenance": {
+        "round": 9,
+        "stone": "measurement_error",
+        "trick": "stone",
+        "worst_rel_err": 0.542174
+      },
+      "id": "ab-006",
+      "added": "2026-09-15T03:29:30"
+    },
+    {
+      "title": "Non-random missing revenue biases the whole model (rows silently dropped)",
+      "stage": "prepare",
+      "node": null,
+      "trigger": "revenue (or another column) is blank for a sizeable share of weeks, and the missingness is statistically associated with the other channel columns (e.g. missing-revenue weeks have systematically higher tv_spend/search_spend than reporting weeks) -- consistent with the outcome itself driving whether it got reported.",
+      "headsup": "The pipeline treats missing revenue as simply 'incomplete weeks' and drops them (dropna, 'complete weeks only'). If those weeks are missing because of their own value -- e.g. finance only finalizes/publishes revenue once it clears a threshold, or a region withholds an unusually high or low week for review -- the surviving weeks are a biased sample, not a random subset, and the channel coefficients (and the overall revenue picture) will be systematically off even though nothing looks broken and the row count just looks a bit smaller than expected.",
+      "mitigation": "Before dropping incomplete rows, check whether missingness correlates with the other observed columns. If it does, investigate why those specific weeks are missing (ask the data owner), and consider imputation or a missingness indicator instead of silently dropping the rows.",
+      "check": {
+        "stage": "prepare",
+        "script": "checks/mnar_missing.py"
+      },
+      "evidence": "simulated",
+      "provenance": {
+        "round": 23,
+        "stone": "mnar_missing",
+        "trick": "stone",
+        "worst_rel_err": 0.29629
+      },
+      "id": "ab-007",
+      "added": "2026-09-15T03:29:30"
+    },
+    {
+      "title": "Negative values in a spend/discount column signal injected measurement noise",
+      "stage": "prepare",
+      "node": null,
+      "trigger": "A spend, count, or discount-percentage column (tv_spend, search_spend, social_spend, email_sends, discount_pct) contains negative values -- structurally impossible in this domain, and a sign that continuous noise/jitter has been added to a column that should be bounded at zero.",
+      "headsup": "This is the same quiet failure family as round 9 (email_sends): nothing crashes and R2 barely moves, but the noised channel's estimated return per dollar is pulled toward zero (errors-in-variables attenuation) while every other channel still reports correctly, so the report looks trustworthy at a glance. This time it hit discount_pct instead of email_sends -- a simple sanity check (no spend/count/discount value should ever be negative) catches both cases and any future one.",
+      "mitigation": "Confirm the source of the noisy column before fitting; if there is genuine platform-level rounding/reconciliation uncertainty, model it explicitly (e.g. errors-in-variables regression) rather than ignoring it.",
+      "check": {
+        "stage": "prepare",
+        "script": "checks/negative_spend_or_discount.py"
+      },
+      "evidence": "simulated",
+      "provenance": {
+        "round": 26,
+        "stone": "measurement_error",
+        "trick": "stone",
+        "worst_rel_err": 0.704448
+      },
+      "id": "ab-008",
+      "added": "2026-09-15T03:29:31"
+    }
+  ]
+}

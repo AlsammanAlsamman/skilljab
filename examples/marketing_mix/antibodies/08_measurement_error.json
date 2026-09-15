@@ -1,0 +1,19 @@
+{
+  "title": "Negative values in a spend/discount column signal injected measurement noise",
+  "stage": "prepare",
+  "node": null,
+  "trigger": "A spend, count, or discount-percentage column (tv_spend, search_spend, social_spend, email_sends, discount_pct) contains negative values -- structurally impossible in this domain, and a sign that continuous noise/jitter has been added to a column that should be bounded at zero.",
+  "headsup": "This is the same quiet failure family as round 9 (email_sends): nothing crashes and R2 barely moves, but the noised channel's estimated return per dollar is pulled toward zero (errors-in-variables attenuation) while every other channel still reports correctly, so the report looks trustworthy at a glance. This time it hit discount_pct instead of email_sends -- a simple sanity check (no spend/count/discount value should ever be negative) catches both cases and any future one.",
+  "mitigation": "Confirm the source of the noisy column before fitting; if there is genuine platform-level rounding/reconciliation uncertainty, model it explicitly (e.g. errors-in-variables regression) rather than ignoring it.",
+  "check": {
+    "stage": "prepare",
+    "script": "checks/negative_spend_or_discount.py"
+  },
+  "evidence": "simulated",
+  "provenance": {
+    "round": 26,
+    "stone": "measurement_error",
+    "trick": "stone",
+    "worst_rel_err": 0.704448
+  }
+}

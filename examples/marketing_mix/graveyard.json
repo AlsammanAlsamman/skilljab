@@ -1,0 +1,172 @@
+{
+  "entries": [
+    {
+      "shape": [
+        "prepare",
+        "fit"
+      ],
+      "data_type": "tabular_regression",
+      "domain": "weekly marketing mix / revenue attribution",
+      "stage": "prepare",
+      "stone": "target_leakage",
+      "failure": "A revenue-derived column (attributed_revenue) left in the predictors crushed every channel coefficient toward zero while R2 stayed high.",
+      "explanation": "In marketing mix data, ad-platform exports often bundle a platform-computed attributed_revenue field alongside the real outcome; a pipeline that keeps every numeric column as a predictor lets OLS lean on that near-duplicate of revenue instead of the real spend channels, silently destroying every channel's estimated return per dollar.",
+      "id": "g-aecace30",
+      "added": "2026-09-15T02:32:20"
+    },
+    {
+      "shape": [
+        "prepare",
+        "fit"
+      ],
+      "data_type": "tabular_regression",
+      "domain": "weekly marketing mix / revenue attribution",
+      "stage": "prepare",
+      "stone": "unit_mix",
+      "failure": "18% of tv_spend rows were 1000x too large (raw dollars instead of $k), collapsing beta_tv_spend to ~0 while other channels stayed accurate.",
+      "explanation": "Regional or per-week media exports sometimes report spend in a different unit (raw dollars vs the usual $k), so a subset of rows becomes a huge-variance outlier population; OLS lets those rows dominate and the affected channel's coefficient is driven toward zero even though it barely disturbs the other channels.",
+      "id": "g-b850cf6d",
+      "added": "2026-09-15T02:32:28"
+    },
+    {
+      "shape": [
+        "prepare",
+        "fit"
+      ],
+      "data_type": "tabular_regression",
+      "domain": "weekly marketing mix / revenue attribution",
+      "stage": "prepare",
+      "stone": "outliers",
+      "failure": "22 of 600 weeks (3.65%) had revenue scaled ~22x, dragging the intercept and multiple channel coefficients off target at once.",
+      "explanation": "Weekly revenue reporting is exposed to refund reversals, duplicate transaction postings, and promo-credit errors that inflate a small number of weeks; a squared-error fit cannot down-weight a handful of such extreme weeks, so they pull several channel coefficients in an uneven, hard-to-diagnose way rather than a clean single-channel shift.",
+      "id": "g-ac0631e8",
+      "added": "2026-09-15T02:32:28"
+    },
+    {
+      "shape": [
+        "prepare",
+        "fit"
+      ],
+      "data_type": "tabular_regression",
+      "domain": "weekly marketing mix / revenue attribution",
+      "stage": "prepare",
+      "stone": "batch_shift",
+      "failure": "44% of search_spend rows carried a constant +3.4 offset with no accompanying batch/source column, inflating beta_search_spend from 4.0 to 7.1; no scan of magnitude, shape, or grouping by region/quarter/row-order separated the shifted rows from noise.",
+      "explanation": "A media platform switching its reporting basis (e.g. net-of-fees to gross billed spend) mid-export produces exactly this: a diffuse, unlabeled batch effect confounded with the exposure itself. Because the feed carries no batch id, source flag, or ingestion timestamp, the shift is statistically invisible in this data and OLS absorbs it directly into the channel's own coefficient -- a failure mode that needs an extra column to even be detectable, not a smarter check.",
+      "id": "g-f8018c39",
+      "added": "2026-09-15T02:32:40"
+    },
+    {
+      "shape": [
+        "prepare",
+        "fit"
+      ],
+      "data_type": "tabular_regression",
+      "domain": "weekly marketing mix / revenue attribution",
+      "stage": "prepare",
+      "stone": "type_corruption",
+      "failure": "Whitespace/non-breaking-space-padded values in discount_pct made pandas read it as text; the naive one-hot-encode-every-object-column rule exploded it into 576 dummy columns and beta_discount_pct came back null.",
+      "explanation": "Spreadsheet round-trips routinely inject stray whitespace, non-breaking spaces, or sentinel strings into an otherwise-numeric export column; a prepare step that decides 'categorical vs numeric' purely from pandas dtype will misclassify that column as categorical and shred a continuous channel into hundreds of near-duplicate dummies, deleting its effect from the model entirely rather than just adding noise to it.",
+      "id": "g-1ecf9651",
+      "added": "2026-09-15T02:32:49"
+    },
+    {
+      "shape": [
+        "prepare",
+        "fit"
+      ],
+      "data_type": "tabular_regression",
+      "domain": "weekly marketing mix / revenue attribution",
+      "stage": "prepare",
+      "stone": "measurement_error",
+      "failure": "Gaussian noise (sd=1.02) added to the email_sends count column turned every value non-integer and attenuated beta_email_sends from 0.5 to 0.23 while every other channel stayed accurate.",
+      "explanation": "email_sends is a count (thousands of emails), so any injected continuous noise shows up as fractional values -- a simple integrity signature. Classical errors-in-variables theory: noise on a predictor biases only that predictor's own coefficient toward zero (attenuation bias), leaving the rest of the model looking healthy, which is what makes it a quiet, easy-to-miss failure.",
+      "id": "g-17144d43",
+      "added": "2026-09-15T02:32:49"
+    },
+    {
+      "shape": [
+        "prepare",
+        "fit"
+      ],
+      "data_type": "tabular_regression",
+      "domain": "weekly marketing mix / revenue attribution",
+      "stage": "prepare",
+      "stone": "target_leakage",
+      "failure": "A noisier leaked column (last_click_revenue, corr 0.78 with revenue) slipped past the round-1 antibody's 0.9 correlation threshold and was still silent.",
+      "explanation": "Target leakage doses vary in how much noise is added to the leaked copy of revenue; a fixed high correlation threshold tuned to one dose (attributed_revenue, corr 0.96) misses a noisier leak from a different attribution model (last-click). Checked the correlation ceiling of every legitimate channel across 27 rounds (max 0.64) and lowered the threshold to 0.75, which safely separates real channels from leaked ones at both noise levels seen so far.",
+      "id": "g-968eb860",
+      "added": "2026-09-15T03:22:33"
+    },
+    {
+      "shape": [
+        "prepare",
+        "fit"
+      ],
+      "data_type": "tabular_regression",
+      "domain": "weekly marketing mix / revenue attribution",
+      "stage": "prepare",
+      "stone": "outliers",
+      "failure": "The outlier spike stone landed on a feature column (social_spend) instead of revenue; the round-4 antibody only scanned revenue, so it went silent.",
+      "explanation": "A budget-cap glitch or currency-conversion slip can spike a spend column's value for a handful of weeks just as easily as it can spike revenue itself (a refund/duplicate posting). A checker that only guards the outcome column misses the same corruption when it lands on a predictor; generalized the scan to every numeric feature column.",
+      "id": "g-dc7a4dbf",
+      "added": "2026-09-15T03:22:33"
+    },
+    {
+      "shape": [
+        "prepare",
+        "fit"
+      ],
+      "data_type": "tabular_regression",
+      "domain": "weekly marketing mix / revenue attribution",
+      "stage": "prepare",
+      "stone": "mnar_missing",
+      "failure": "150/600 weeks had revenue blanked in a way correlated with tv_spend/search_spend (std-diff ~0.98); dropna() silently discarded them, truncating and biasing the outcome sample.",
+      "explanation": "A hold-out stone (never shown in the first pass) mimicking a reporting gate: finance/regional teams sometimes only finalize or publish a week's revenue once it clears a threshold or passes review, so missingness is driven by the value itself, not chance. Detected a testable proxy -- the missing-revenue rows have systematically higher spend on the channels that drive revenue -- via a standardized mean-difference test between missing and present groups on the raw pre-dropna input.",
+      "id": "g-73ca469f",
+      "added": "2026-09-15T03:22:49"
+    },
+    {
+      "shape": [
+        "prepare",
+        "fit"
+      ],
+      "data_type": "tabular_regression",
+      "domain": "weekly marketing mix / revenue attribution",
+      "stage": "prepare",
+      "stone": "unit_mix",
+      "failure": "The same 1000x unit-mix corruption on tv_spend was injected AFTER the prepare-stage check already ran clean (after_stage: prepare), so the existing antibody missed it even though the corrupted file is what fit.py actually consumed.",
+      "explanation": "The engine can apply a stone after a stage's own checks have already run, meaning a check registered only at that stage's checkpoint can see stale (clean) data. This is a check-ordering/timing gap, not a new corruption pattern: generalized the checker to scan every file path it is given and registered it at both the prepare and fit checkpoints so the corruption is caught whichever point it actually lands at.",
+      "id": "g-7c612c31",
+      "added": "2026-09-15T03:22:50"
+    },
+    {
+      "shape": [
+        "prepare",
+        "fit"
+      ],
+      "data_type": "tabular_regression",
+      "domain": "weekly marketing mix / revenue attribution",
+      "stage": "prepare",
+      "stone": "measurement_error",
+      "failure": "Gaussian noise (sd=1.26) added to discount_pct pushed 60/600 rows negative (impossible for a discount percentage), attenuating beta_discount_pct while the round-9 email_sends-only integer check had no foothold on this continuous column.",
+      "explanation": "Every spend/count/discount column in this domain is bounded at zero by definition; injected measurement noise on a column that sits close to its floor for many weeks (discount_pct averages ~10 with sd ~5) will push a meaningful share of rows below zero. A generic non-negativity check across all such columns catches this and any future occurrence, complementing the integer-count check for columns that are naturally continuous.",
+      "id": "g-17c7d9a2",
+      "added": "2026-09-15T03:22:50"
+    },
+    {
+      "shape": [
+        "prepare",
+        "fit"
+      ],
+      "data_type": "tabular_regression",
+      "domain": "weekly marketing mix / revenue attribution",
+      "stage": "prepare",
+      "stone": "batch_shift",
+      "failure": "The same undetectable diffuse batch shift (declared unguardable after round 5) reappeared on discount_pct (38% of rows, +2.8), confirming the failure mode is general to the stone, not specific to search_spend.",
+      "explanation": "Re-ran the full round-5 detection battery (magnitude ratio, skew/kurtosis, region/quarter/row-order grouping, 1- vs 2-component Gaussian-mixture BIC) on discount_pct in round 27 -- none separated the shifted rows from noise, matching round 5 exactly. No new checker written (it would fire on nothing); the existing unguardable-class antibody was generalized to cover any channel instead of duplicating it.",
+      "id": "g-c0da9a79",
+      "added": "2026-09-15T03:22:50"
+    }
+  ]
+}

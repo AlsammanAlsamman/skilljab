@@ -1,0 +1,19 @@
+{
+  "title": "Non-random missing revenue biases the whole model (rows silently dropped)",
+  "stage": "prepare",
+  "node": null,
+  "trigger": "revenue (or another column) is blank for a sizeable share of weeks, and the missingness is statistically associated with the other channel columns (e.g. missing-revenue weeks have systematically higher tv_spend/search_spend than reporting weeks) -- consistent with the outcome itself driving whether it got reported.",
+  "headsup": "The pipeline treats missing revenue as simply 'incomplete weeks' and drops them (dropna, 'complete weeks only'). If those weeks are missing because of their own value -- e.g. finance only finalizes/publishes revenue once it clears a threshold, or a region withholds an unusually high or low week for review -- the surviving weeks are a biased sample, not a random subset, and the channel coefficients (and the overall revenue picture) will be systematically off even though nothing looks broken and the row count just looks a bit smaller than expected.",
+  "mitigation": "Before dropping incomplete rows, check whether missingness correlates with the other observed columns. If it does, investigate why those specific weeks are missing (ask the data owner), and consider imputation or a missingness indicator instead of silently dropping the rows.",
+  "check": {
+    "stage": "prepare",
+    "script": "checks/mnar_missing.py"
+  },
+  "evidence": "simulated",
+  "provenance": {
+    "round": 23,
+    "stone": "mnar_missing",
+    "trick": "stone",
+    "worst_rel_err": 0.29629
+  }
+}

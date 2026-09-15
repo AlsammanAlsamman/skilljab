@@ -1,0 +1,19 @@
+{
+  "title": "A numeric column gets mistaken for a category and shredded into hundreds of dummy columns",
+  "stage": "prepare",
+  "node": null,
+  "trigger": "A numeric column (e.g. discount_pct) has whitespace, non-breaking-space padding, or blank/sentinel entries from a spreadsheet export, making pandas read it as text; the pipeline's 'one-hot encode every text column' rule then explodes it into hundreds of near-duplicate dummy columns instead of keeping it as one number.",
+  "headsup": "That channel effectively vanishes from the model -- it is not just noisy, its coefficient is completely absent from the results (discount_pct came back as null here) -- while everything else in the report still looks normal, which makes this the easiest failure to miss. Check that every column you expect to be numeric actually loaded as a number, not text, before trusting the coefficient table, especially after any spreadsheet round-trip.",
+  "mitigation": "Strip whitespace/non-breaking spaces and coerce the column to numeric (pd.to_numeric with errors handled) before deciding which columns are categorical for one-hot encoding.",
+  "check": {
+    "stage": "prepare",
+    "script": "checks/numeric_column_exploded.py"
+  },
+  "evidence": "simulated",
+  "provenance": {
+    "round": 7,
+    "stone": "type_corruption",
+    "trick": "stone",
+    "worst_rel_err": 1.270768
+  }
+}
